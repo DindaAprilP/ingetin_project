@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:ingetin/awal.dart';
-import 'package:ingetin/register.dart';
+import 'package:ingetin_project/navbottom.dart';
+import 'register.dart';
 import 'text_field.dart';
 import 'package:get/get.dart';
 
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ElevatedButton(onPressed: (){
                 final box = GetStorage();
                 box.write('username', usernameController.text);
-                Get.to(()=> LoginScreen()); //GANTI KE HALAMAN BERANDA KOSONG 
+                Get.to(()=> bottomNavigationBar()); 
                 Get.snackbar(
                   "LOGIN",
                   "Berhasil Masuk",

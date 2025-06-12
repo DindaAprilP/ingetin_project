@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'navbottom.dart';
 import 'text_field.dart';
 import 'package:get/get.dart';
 import 'login.dart';
@@ -108,7 +109,7 @@ class _RegisterState extends State<Register> {
             ElevatedButton(onPressed: (){
               final box = GetStorage();
                 box.write('E-mail', emailController.text);
-                Get.to(()=>LoginScreen()); // GANTI KE HALAMAN BERANDA
+                Get.to(()=>bottomNavigationBar()); 
                 Get.snackbar(
                   "REGISTER",
                   "Berhasil Daftar",

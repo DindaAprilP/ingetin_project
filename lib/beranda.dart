@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'menu.dart';
-import 'profil.dart';
 
 class Beranda extends StatefulWidget {
   const Beranda({super.key});
@@ -10,45 +9,6 @@ class Beranda extends StatefulWidget {
 }
 
 class _BerandaState extends State<Beranda> {
-  int _selectedIndex = 0;
-
-  late final List<Widget> _pages;
-
-  @override
-  void initState() {
-    super.initState();
-    _pages = <Widget>[
-      // Halaman Beranda
-      Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            'assets/logoberanda.jpeg',
-            width: 200,
-            height: 200,
-          ),
-          const SizedBox(height: 15),
-          const Text(
-            'Belum Ada Catatan',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-
-      Menu(),
-      Profil(),
-    ];
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,27 +26,24 @@ class _BerandaState extends State<Beranda> {
           ),
         ),
       ),
-      body: Center(child: _pages[_selectedIndex]), 
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        backgroundColor: Colors.black,
-        unselectedItemColor: Colors.white,
-        selectedItemColor: Colors.white,
-        onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.note),
-            label: 'Catatan',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
+      body: 
+      Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 150,
+              height: 150,
+              child: Image.asset(
+                "assets/berandaKosong.png",
+                width: 120,
+                height: 120,
+              ),
+            ),
+            SizedBox(height: 5),
+            Text("Belum Ada Catatan"),
+          ],
+        ),
       ),
     );
   }
