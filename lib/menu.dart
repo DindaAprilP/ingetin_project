@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'schadule.dart';
 class Menu extends StatefulWidget {
   const Menu({super.key});
 
@@ -95,7 +95,7 @@ class _MenuState extends State<Menu> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HalamanJadwal()),
+                  MaterialPageRoute(builder: (context) => Schadule()),
                 );
               },
               child: Container(
