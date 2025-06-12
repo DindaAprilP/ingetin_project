@@ -16,12 +16,11 @@ class _MenuState extends State<Menu> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Notes box
             GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const NotesPage()),
+                  MaterialPageRoute(builder: (context) => HalamanCatatan()),
                 );
               },
               child: Container(
@@ -37,7 +36,7 @@ class _MenuState extends State<Menu> {
                     ),
                   ],
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.note_outlined, size: 36, color: Colors.black87),
@@ -53,14 +52,12 @@ class _MenuState extends State<Menu> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
-            // To Do List (terpilih)
+            SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ToDoListPage()),
+                  MaterialPageRoute(builder: (context) =>ToDoListPage()),
                 );
               },
               child: Container(
@@ -70,14 +67,14 @@ class _MenuState extends State<Menu> {
                   color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.blue, width: 2),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 4,
                     ),
                   ],
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.check, size: 36, color: Colors.black87),
@@ -93,14 +90,12 @@ class _MenuState extends State<Menu> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
-            // Schedule box
+            SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SchedulePage()),
+                  MaterialPageRoute(builder: (context) => HalamanJadwal()),
                 );
               },
               child: Container(
@@ -116,7 +111,7 @@ class _MenuState extends State<Menu> {
                     ),
                   ],
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.schedule, size: 36, color: Colors.black87),
@@ -135,45 +130,6 @@ class _MenuState extends State<Menu> {
           ],
         ),
       ),
-    );
-  }
-}
-
-// Contoh halaman Notes
-class NotesPage extends StatelessWidget {
-  const NotesPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Notes')),
-      body: const Center(child: Text('Ini halaman Notes')),
-    );
-  }
-}
-
-// Contoh halaman To Do List
-class ToDoListPage extends StatelessWidget {
-  const ToDoListPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('To Do List')),
-      body: const Center(child: Text('Ini halaman To Do List')),
-    );
-  }
-}
-
-// Contoh halaman Schedule
-class SchedulePage extends StatelessWidget {
-  const SchedulePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Schedule')),
-      body: const Center(child: Text('Ini halaman Schedule')),
     );
   }
 }
