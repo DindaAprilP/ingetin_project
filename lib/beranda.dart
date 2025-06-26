@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'menu.dart';
 
 class Beranda extends StatefulWidget {
   const Beranda({super.key});
@@ -15,7 +14,7 @@ class _BerandaState extends State<Beranda> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Center(
+        title: Center(
           child: Text(
             'Inget.In',
             style: TextStyle(

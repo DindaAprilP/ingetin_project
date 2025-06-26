@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:ingetin_project/login.dart';
+import 'package:ingetin_project/note.dart';
+import 'package:ingetin_project/register.dart';
 import 'schadule.dart';
+import 'package:animation_search_bar/animation_search_bar.dart';
+
 class Menu extends StatefulWidget {
   const Menu({super.key});
 
@@ -8,9 +13,13 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
+  final TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+      ),
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
@@ -20,7 +29,7 @@ class _MenuState extends State<Menu> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HalamanCatatan()),
+                  MaterialPageRoute(builder: (context) => AddNotesPage()),
                 );
               },
               child: Container(
@@ -57,7 +66,7 @@ class _MenuState extends State<Menu> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>ToDoListPage()),
+                  MaterialPageRoute(builder: (context) =>LoginScreen()),
                 );
               },
               child: Container(
