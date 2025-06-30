@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ingetin_project/login.dart';
 import 'package:ingetin_project/note.dart';
-import 'package:ingetin_project/register.dart';
 import 'schadule.dart';
-import 'package:animation_search_bar/animation_search_bar.dart';
 
 class Menu extends StatefulWidget {
   const Menu({super.key});
