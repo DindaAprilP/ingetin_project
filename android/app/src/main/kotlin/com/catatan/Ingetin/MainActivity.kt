@@ -1,4 +1,4 @@
-package com.example.ingetin_project
+package com.catatan.Ingetin
 
 import io.flutter.embedding.android.FlutterActivity
 
