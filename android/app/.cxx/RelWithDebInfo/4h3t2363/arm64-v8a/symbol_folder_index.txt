@@ -1,0 +1,1 @@
+/home/user/ingetin_project/build/app/intermediates/cxx/RelWithDebInfo/4h3t2363/obj/arm64-v8a

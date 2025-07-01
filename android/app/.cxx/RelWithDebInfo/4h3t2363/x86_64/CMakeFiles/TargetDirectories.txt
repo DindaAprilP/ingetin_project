@@ -1,0 +1,2 @@
+/home/user/ingetin_project/android/app/.cxx/RelWithDebInfo/4h3t2363/x86_64/CMakeFiles/edit_cache.dir
+/home/user/ingetin_project/android/app/.cxx/RelWithDebInfo/4h3t2363/x86_64/CMakeFiles/rebuild_cache.dir
