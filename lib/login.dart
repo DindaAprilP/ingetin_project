@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ingetin_project/navbottom.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'register.dart';
 import 'text_field.dart';
 import 'package:get/get.dart';
@@ -13,9 +14,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool lihatPass = true;
+  bool isLoading = false;
 
   void lihat(){
     setState(() {
@@ -23,101 +25,185 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  Future<void> loginWithSupabase() async {
+    // Validasi input kosong
+    if (emailController.text.trim().isEmpty || passwordController.text.trim().isEmpty) {
+      Get.snackbar(
+        "LOGIN GAGAL",
+        "Email dan password tidak boleh kosong",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final supabase = Supabase.instance.client;
+      final response = await supabase.auth.signInWithPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+
+      if (response.user != null) {
+        final box = GetStorage();
+        box.write('user_id', response.user!.id);
+        box.write('email', response.user!.email);
+        
+        Get.offAll(() => bottomNavigationBar());
+        Get.snackbar(
+          "LOGIN BERHASIL",
+          "Selamat datang!",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      }
+    } catch (error) {
+      Get.snackbar(
+        "LOGIN GAGAL",
+        "Email atau password salah",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:
-      Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              "assets/login.png",
-              width: 150,
-              height: 150,
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(onPressed: (){
-                  Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context)=> LoginScreen()),
-                  );
-                },
-                child: Text('Login'),
-                  style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.black
-                  ),
-                ),
-                ElevatedButton(onPressed: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context)=> Register()),
-                  );
-                },
-                child: Text('Register'),
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black
-                )
-                )
-              ],
-            ),
-            SizedBox(height: 15),
-            Container(
-              width: 300,
-              height: 200,
-              padding: EdgeInsets.all(30),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(10),
+      body: Center(
+        child: SingleChildScrollView( 
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/login.png",
+                width: 150,
+                height: 150,
               ),
-              child: Column(
+              SizedBox(height: 10),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextIsi(
-                    labelText: "E-mail",
-                    iconData: Icons.email,
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    obscureText: lihatPass,
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      prefixIcon: Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        onPressed: lihat,
-                        icon: Icon(
-                          lihatPass ? Icons.visibility_off : Icons.visibility,
-                        )
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      'Login',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  )
+                  ),
+                  SizedBox(width: 5),
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(() => Register());
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(color: Colors.grey[400]!, width: 1),
+                      ),
+                      child: Text(
+                        'Register',
+                        style: TextStyle(
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(onPressed: (){
-                final box = GetStorage();
-                box.write('username', usernameController.text);
-                Get.to(()=> bottomNavigationBar()); 
-                Get.snackbar(
-                  "LOGIN",
-                  "Berhasil Masuk",
-                  snackPosition: SnackPosition.TOP,
-                );
-              },
-              child: Text('Login'),
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.black
+              
+              SizedBox(height: 15),
+              Container(
+                width: 300,
+                padding: EdgeInsets.all(30),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextIsi(
+                      controller: emailController,
+                      labelText: "E-mail",
+                      iconData: Icons.email,
+                    ),
+                    SizedBox(height: 20),
+                    TextIsi(
+                      controller: passwordController,
+                      labelText: "Password",
+                      iconData: Icons.lock,
+                      obscureText: lihatPass,
+                      suffixIcon: lihatPass ? Icons.visibility_off : Icons.visibility,
+                      onSuffixIconPressed: lihat,
+                    )
+                  ],
+                ),
               ),
-            ),
-          ],
+              
+              SizedBox(height: 20),
+              SizedBox(
+                width: 200,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : loginWithSupabase,
+                  child: isLoading 
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text('Loading...'),
+                        ],
+                      )
+                    : Text('Login'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       )
     );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 }
