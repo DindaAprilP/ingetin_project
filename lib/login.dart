@@ -26,11 +26,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> loginWithSupabase() async {
-    // Validasi input kosong
     if (emailController.text.trim().isEmpty || passwordController.text.trim().isEmpty) {
       Get.snackbar(
         "LOGIN GAGAL",
         "Email dan password tidak boleh kosong",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (!GetUtils.isEmail(emailController.text.trim())) {
+      Get.snackbar(
+        "LOGIN GAGAL",
+        "Format email tidak valid",
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -50,23 +60,61 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.user != null) {
-        final box = GetStorage();
-        box.write('user_id', response.user!.id);
-        box.write('email', response.user!.email);
-        
-        Get.offAll(() => bottomNavigationBar());
-        Get.snackbar(
-          "LOGIN BERHASIL",
-          "Selamat datang!",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+        try {
+          final profileResponse = await supabase
+              .from('profil_pengguna')
+              .select('nama_pengguna, url_avatar')
+              .eq('id', response.user!.id)
+              .single();
+
+          final box = GetStorage();
+          box.write('user_id', response.user!.id);
+          box.write('email', response.user!.email);
+          box.write('username', profileResponse['nama_pengguna'] ?? '');
+          box.write('avatar_url', profileResponse['url_avatar'] ?? '');
+
+          Get.offAll(() => bottomNavigationBar());
+          Get.snackbar(
+            "LOGIN BERHASIL",
+            "Selamat datang, ${profileResponse['nama_pengguna'] ?? 'User'}!",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        } catch (profileError) {
+          final box = GetStorage();
+          box.write('user_id', response.user!.id);
+          box.write('email', response.user!.email);
+          box.write('username', '');
+          box.write('avatar_url', '');
+
+          Get.offAll(() => bottomNavigationBar());
+          Get.snackbar(
+            "LOGIN BERHASIL",
+            "Selamat datang!",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        }
       }
     } catch (error) {
+      String errorMessage = "Terjadi kesalahan saat login";
+      
+      // Handle specific errors
+      if (error.toString().contains('Invalid login credentials')) {
+        errorMessage = "Email atau password salah";
+      } else if (error.toString().contains('Email not confirmed')) {
+        errorMessage = "Email belum dikonfirmasi";
+      } else if (error.toString().contains('Too many requests')) {
+        errorMessage = "Terlalu banyak percobaan login. Coba lagi nanti";
+      } else if (error.toString().contains('Invalid email')) {
+        errorMessage = "Format email tidak valid";
+      }
+      
       Get.snackbar(
         "LOGIN GAGAL",
-        "Email atau password salah",
+        errorMessage,
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -131,7 +179,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              
               SizedBox(height: 15),
               Container(
                 width: 300,
@@ -147,6 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: emailController,
                       labelText: "E-mail",
                       iconData: Icons.email,
+                      keyboardType: TextInputType.emailAddress,
                     ),
                     SizedBox(height: 20),
                     TextIsi(
@@ -160,7 +208,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-              
               SizedBox(height: 20),
               SizedBox(
                 width: 200,
