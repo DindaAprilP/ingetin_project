@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 class TextIsi extends StatelessWidget {
   const TextIsi({
     super.key,
-    this.controller, 
+    this.controller,
     this.labelText,
     this.radius,
     this.iconData,
-    this.obscureText = false, 
+    this.obscureText = false,
     this.keyboardType,
     this.suffixIcon,
     this.onSuffixIconPressed,
@@ -29,11 +29,10 @@ class TextIsi extends StatelessWidget {
       obscureText: obscureText,
       keyboardType: keyboardType,
       decoration: InputDecoration(
-        fillColor: Colors.orange[700],
         labelText: labelText,
         hintText: "Masukkan $labelText",
         prefixIcon: Icon(iconData ?? Icons.email_outlined),
-        suffixIcon: suffixIcon != null 
+        suffixIcon: suffixIcon != null
           ? IconButton(
               onPressed: onSuffixIconPressed,
               icon: Icon(suffixIcon),
