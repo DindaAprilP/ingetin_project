@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.black,
-                      borderRadius: BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(50),
                     ),
                     child: Text(
                       'Login',
@@ -166,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(50),
                         border: Border.all(color: Colors.grey[400]!, width: 1),
                       ),
                       child: Text(
@@ -235,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(90),
                     ),
                   ),
                 ),
