@@ -98,6 +98,14 @@ class _BerandaState extends State<Beranda> {
     }
   }
 
+  Future<void> navigateToEdit(Map<String, dynamic> item) async {
+    final result = await Get.to(() => EditCatatan(catatan: item));
+    
+    if (result == true) {
+      loadCatatan();
+    }
+  }
+
   void lihatDetailCatatan(Map<String, dynamic> item) {
     showModalBottomSheet(
       context: context,
@@ -124,12 +132,26 @@ class _BerandaState extends State<Beranda> {
                 ),
               ),
               SizedBox(height: 20),
-              Text(
-                item['judul'],
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      item['judul'],
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Tutup modal
+                      navigateToEdit(item); // Navigasi ke edit
+                    },
+                    icon: Icon(Icons.edit),
+                    tooltip: 'Edit Catatan',
+                  ),
+                ],
               ),
               SizedBox(height: 10),
               Container(
@@ -152,7 +174,7 @@ class _BerandaState extends State<Beranda> {
                 child: _buildDetailContent(item),
               ),
               Text(
-                'Diperbarui: ${_formatTanggal(item['diperbarui_pada'])}',
+                'Diperbarui: ${_formatTanggalWIB(item['diperbarui_pada'])}',
                 style: TextStyle(
                   color: Colors.grey[600],
                   fontSize: 12,
@@ -179,7 +201,7 @@ class _BerandaState extends State<Beranda> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoRow('Tanggal', _formatTanggal(item['tanggal_jadwal'])),
+            _buildInfoRow('Tanggal', _formatTanggalWIB(item['tanggal_jadwal'])),
             _buildInfoRow('Jam', '${item['jam_mulai']} - ${item['jam_selesai']}'),
             if (item['deskripsi_jadwal'] != null)
               _buildInfoRow('Deskripsi', item['deskripsi_jadwal']),
@@ -304,15 +326,20 @@ class _BerandaState extends State<Beranda> {
     }
   }
 
-  String _formatTanggal(String? tanggal) {
-    if (tanggal == null) return '-';
-    try {
-      final date = DateTime.parse(tanggal);
-      return '${date.day}/${date.month}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-    } catch (e) {
-      return tanggal;
-    }
+  String _formatTanggalWIB(String? tanggal) {
+  if (tanggal == null) return '-';
+  try {
+    // Parse tanggal sebagai UTC
+    final utcDate = DateTime.parse(tanggal);
+    
+    // Tambahkan 7 jam untuk WIB (UTC+7)
+    final wibDate = utcDate.add(Duration(hours: 7));
+    
+    return '${wibDate.day}/${wibDate.month}/${wibDate.year} ${wibDate.hour.toString().padLeft(2, '0')}:${wibDate.minute.toString().padLeft(2, '0')} WIB';
+  } catch (e) {
+    return tanggal;
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -322,7 +349,7 @@ class _BerandaState extends State<Beranda> {
         backgroundColor: Colors.black,
         title: Center(
           child: Text(
-            'Inget.In',
+            'Inget.in',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -410,7 +437,7 @@ class _BerandaState extends State<Beranda> {
                                           )
                                         else if (item['jenis_catatan'] == 'jadwal' && item['tanggal_jadwal'] != null)
                                           Text(
-                                            _formatTanggal(item['tanggal_jadwal']),
+                                            _formatTanggalWIB(item['tanggal_jadwal']),
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.grey[600],
@@ -418,7 +445,7 @@ class _BerandaState extends State<Beranda> {
                                           )
                                         else
                                           Text(
-                                            _formatTanggal(item['diperbarui_pada']),
+                                            _formatTanggalWIB(item['diperbarui_pada']),
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.grey[600],
@@ -434,7 +461,7 @@ class _BerandaState extends State<Beranda> {
                                     ),
                                     onSelected: (value) {
                                       if (value == 'edit') {
-                                        Get.to(() => EditCatatan(catatan: item));
+                                        navigateToEdit(item);
                                       } else if (value == 'delete') {
                                         hapusCatatan(item['id'], item['judul']);
                                       }

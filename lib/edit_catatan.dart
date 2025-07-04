@@ -16,39 +16,82 @@ class _EditCatatanState extends State<EditCatatan> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _judulController;
   late TextEditingController _isiController;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _judulController = TextEditingController(text: widget.catatan['judul']);
-    _isiController = TextEditingController(text: widget.catatan['isi_catatan']);
+    _isiController = TextEditingController(text: widget.catatan['isi_catatan'] ?? '');
+  }
+
+  @override
+  void dispose() {
+    _judulController.dispose();
+    _isiController.dispose();
+    super.dispose();
   }
 
   Future<void> _simpanPerubahan() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
         await supabase.from('catatan').update({
-          'judul': _judulController.text,
-          'isi_catatan': _isiController.text,
-          'diperbarui_pada': DateTime.now().toIso8601String(),
+          'judul': _judulController.text.trim(),
         }).eq('id', widget.catatan['id']);
 
-        Get.back();
-        Get.snackbar(
-          "Sukses",
-          "Catatan berhasil diperbarui",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
+        final isiCatatanResponse = await supabase
+            .from('isi_catatan')
+            .select('id')
+            .eq('id_catatan', widget.catatan['id'])
+            .maybeSingle();
+
+        if (isiCatatanResponse != null) {
+          await supabase.from('isi_catatan').update({
+            'isi_konten': _isiController.text.trim(),
+          }).eq('id_catatan', widget.catatan['id']);
+        } else {
+          await supabase.from('isi_catatan').insert({
+            'id_catatan': widget.catatan['id'],
+            'isi_konten': _isiController.text.trim(),
+          });
+        }
+
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          
+          Get.back(result: true);
+          Get.snackbar(
+            "Sukses",
+            "Catatan berhasil diperbarui",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            duration: Duration(seconds: 2),
+          );
+        }
       } catch (e) {
-        Get.snackbar(
-          "Gagal",
-          "Tidak dapat menyimpan perubahan",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        print('Error updating catatan: $e');
+        
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          
+          Get.snackbar(
+            "Gagal",
+            "Tidak dapat menyimpan perubahan: ${e.toString()}",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: Duration(seconds: 3),
+          );
+        }
       }
     }
   }
@@ -59,6 +102,26 @@ class _EditCatatanState extends State<EditCatatan> {
       appBar: AppBar(
         title: Text("Edit Catatan"),
         backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        actions: [
+          _isLoading
+              ? Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  onPressed: _simpanPerubahan,
+                  icon: Icon(Icons.check),
+                  tooltip: 'Simpan Perubahan',
+                ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -68,23 +131,29 @@ class _EditCatatanState extends State<EditCatatan> {
             children: [
               TextFormField(
                 controller: _judulController,
-                decoration: InputDecoration(labelText: 'Judul'),
+                decoration: InputDecoration(
+                  labelText: 'Judul',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Judul wajib diisi' : null,
+                    value == null || value.trim().isEmpty ? 'Judul wajib diisi' : null,
+                enabled: !_isLoading,
               ),
-              SizedBox(height: 12),
-              TextFormField(
-                controller: _isiController,
-                decoration: InputDecoration(labelText: 'Isi Catatan'),
-                maxLines: 5,
+              SizedBox(height: 16),
+              Expanded(
+                child: TextFormField(
+                  controller: _isiController,
+                  decoration: InputDecoration(
+                    labelText: 'Isi Catatan',
+                    border: OutlineInputBorder(),
+                    alignLabelWithHint: true,
+                  ),
+                  maxLines: null,
+                  expands: true,
+                  textAlignVertical: TextAlignVertical.top,
+                  enabled: !_isLoading,
+                ),
               ),
-              SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: _simpanPerubahan,
-                icon: Icon(Icons.save),
-                label: Text("Simpan"),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-              )
             ],
           ),
         ),
