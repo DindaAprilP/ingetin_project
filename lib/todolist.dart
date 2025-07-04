@@ -1,19 +1,5 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const AddToDoPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
 class AddToDoPage extends StatefulWidget {
   const AddToDoPage({super.key});
 
@@ -44,12 +30,12 @@ class _AddToDoPageState extends State<AddToDoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Text(
+            Text(
               'To Do List',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-             Text(
+            Text(
               'Tambahkan Judul',
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
             ),
