@@ -64,7 +64,7 @@ class _MenuState extends State<Menu> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>LoginScreen()),
+                  MaterialPageRoute(builder: (context) =>AddNotesPage()),
                 );
               },
               child: Container(
