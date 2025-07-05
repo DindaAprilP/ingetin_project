@@ -9,38 +9,74 @@ class splashAwal extends StatefulWidget {
   State<splashAwal> createState() => _splashAwalState();
 }
 
-class _splashAwalState extends State<splashAwal> {
+class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacityAnimation;
+  late Animation<double> _scaleAnimation;
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 3), (){
-      Get.off (()=> LoginScreen());
+
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2), 
+      vsync: this,
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeIn, 
+      ),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.elasticOut,
+      ),
+    );
+
+    _controller.forward(); 
+
+   
+    Future.delayed(const Duration(seconds: 3), () {
+      Get.off(() => LoginScreen());
     });
   }
-  
+
+  @override
+  void dispose() {
+    _controller.dispose(); 
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: 
-      Center(
+      backgroundColor: Colors.white, 
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 150,
-              height: 150,
-              child: Image.asset(
-                "assets/splashAwal.png",
-                width: 120,
-                height: 120,
+            FadeTransition(
+              opacity: _opacityAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Image.asset(
+                  "assets/splashAwal.png",
+                  width: 150,
+                  height: 150,
                 ),
+              ),
             ),
-            SizedBox(height: 5),
-            Container(
-              width: 100,
-              height: 150,
+            const SizedBox(height: 10), 
+            FadeTransition(
+              opacity: _opacityAnimation, 
               child: Image.asset(
-                "assets/ingetinHitam.png"
+                "assets/ingetinHitam.png",
+                width: 120, 
+                height: 120,
               ),
             ),
           ],
