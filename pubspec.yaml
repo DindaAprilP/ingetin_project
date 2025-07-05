@@ -37,6 +37,7 @@ dependencies:
   animated_bottom_navigation_bar: ^1.4.0
   supabase_flutter: ^2.9.1
   path_provider: ^2.1.5
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
