@@ -12,7 +12,7 @@ class EditCatatan extends StatefulWidget {
 }
 
 class _EditCatatanState extends State<EditCatatan> {
-  final supabase = Supabase.instance.client;
+  final supabase = Supabase.instance.client; 
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _judulController;
   late TextEditingController _isiKontenController;
@@ -626,3 +626,5 @@ class _EditCatatanState extends State<EditCatatan> {
     );
   }
 }
+
+//biar bisa comit
