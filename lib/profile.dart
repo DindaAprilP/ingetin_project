@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ingetin_project/models/profil_models.dart';
-import 'dart:typed_data';
+import 'package:ingetin_project/supabase/profil_supa.dart'; 
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -12,19 +12,21 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  final supabase = Supabase.instance.client;
+  // Inisialisasi service di sini
+  late final ProfileService _profileService;
   final _usernameController = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
 
   String? _avatarUrl;
   String? _email;
-  bool _isLoading = true; 
-  bool _isUpdating = false; 
-  bool _isUploadingAvatar = false; 
+  bool _isLoading = true;
+  bool _isUpdating = false;
+  bool _isUploadingAvatar = false;
 
   @override
   void initState() {
     super.initState();
+    // Inisialisasi service dengan SupabaseClient dan ImagePicker
+    _profileService = ProfileService(Supabase.instance.client, ImagePicker());
     _fetchUserProfile();
   }
 
@@ -40,29 +42,28 @@ class _ProfileState extends State<Profile> {
     });
 
     try {
-      final user = supabase.auth.currentUser;
+      final user = Supabase.instance.client.auth.currentUser;
       if (user == null) {
         _showSnackBar('Anda belum login.', Colors.red);
-        if (mounted) Navigator.pop(context); 
+        if (mounted) Navigator.pop(context);
         return;
       }
 
-      _email = user.email; 
+      _email = user.email;
+      // Gunakan service untuk mengambil profil
+      final profil = await _profileService.fetchUserProfile(user.id);
 
-      final response = await supabase
-          .from('profil_pengguna')
-          .select()
-          .eq('id', user.id)
-          .single();
-
-      final profil = ProfilPengguna.fromMap(response);
-      _usernameController.text = profil.namaPengguna;
-      _avatarUrl = profil.urlAvatar;
-    } on PostgrestException catch (e) {
-      _showSnackBar('Gagal mengambil profil: ${e.message}', Colors.red);
-      _usernameController.text = _email?.split('@').first ?? 'Pengguna Baru';
+      if (profil != null) {
+        _usernameController.text = profil.namaPengguna;
+        _avatarUrl = profil.urlAvatar;
+      } else {
+        // Jika profil belum ada di database, gunakan email sebagai default username
+        _usernameController.text = _email?.split('@').first ?? 'Pengguna Baru';
+        _avatarUrl = null; // Pastikan avatar direset jika profil baru
+      }
     } catch (e) {
-      _showSnackBar('Terjadi kesalahan tak terduga: ${e.toString()}', Colors.red);
+      _showSnackBar('Gagal mengambil profil: ${e.toString()}', Colors.red);
+      _usernameController.text = _email?.split('@').first ?? 'Pengguna Baru'; // Fallback
     } finally {
       setState(() {
         _isLoading = false;
@@ -76,7 +77,7 @@ class _ProfileState extends State<Profile> {
     });
 
     try {
-      final user = supabase.auth.currentUser;
+      final user = Supabase.instance.client.auth.currentUser;
       if (user == null) {
         _showSnackBar('Anda belum login.', Colors.red);
         return;
@@ -89,19 +90,17 @@ class _ProfileState extends State<Profile> {
         return;
       }
 
-       final profilData = {
-        'id': user.id, 
-        'nama_pengguna': newUsername,
-        'url_avatar': _avatarUrl,
-      };
-
-      await supabase.from('profil_pengguna').upsert(profilData);
+      // Buat objek ProfilPengguna dan gunakan service untuk memperbarui
+      final profilToUpdate = ProfilPengguna(
+        id: user.id,
+        namaPengguna: newUsername,
+        urlAvatar: _avatarUrl,
+      );
+      await _profileService.updateProfile(profilToUpdate);
 
       _showSnackBar('Profil berhasil diperbarui!', Colors.green);
-    } on PostgrestException catch (e) {
-      _showSnackBar('Gagal memperbarui profil: ${e.message}', Colors.red);
     } catch (e) {
-      _showSnackBar('Terjadi kesalahan tak terduga: ${e.toString()}', Colors.red);
+      _showSnackBar('Gagal memperbarui profil: ${e.toString()}', Colors.red);
     } finally {
       setState(() {
         _isUpdating = false;
@@ -110,51 +109,33 @@ class _ProfileState extends State<Profile> {
   }
 
   Future<void> _pickAndUploadAvatar() async {
-    final user = supabase.auth.currentUser;
+    final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
       _showSnackBar('Anda harus login untuk mengunggah avatar.', Colors.red);
       return;
     }
-
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (image == null) {
-      _showSnackBar('Tidak ada gambar yang dipilih.', Colors.blueGrey);
-      return;
-    }
-
-    print('Selected image path: ${image.path}');
 
     setState(() {
       _isUploadingAvatar = true;
     });
 
     try {
-      final Uint8List bytes = await image.readAsBytes();
+      // Gunakan service untuk memilih dan mengunggah avatar
+      final publicUrl = await _profileService.pickAndUploadAvatar(user.id);
 
-      final fileExtension = image.path.split('.').last;
-      final fileName = '${user.id}/avatar.$fileExtension';
-
-      await supabase.storage.from('avatars').uploadBinary(
-            fileName,
-            bytes, 
-            fileOptions: const FileOptions(upsert: true), 
-          );
-
-      final String publicUrl = supabase.storage.from('avatars').getPublicUrl(fileName);
-
-      setState(() {
-        _avatarUrl = publicUrl; 
-      });
-
-      await _updateProfile();
-
-      _showSnackBar('Avatar berhasil diunggah!', Colors.green);
-    } on StorageException catch (e) {
-      _showSnackBar('Gagal mengunggah avatar: ${e.message}', Colors.red);
+      if (publicUrl != null) {
+        setState(() {
+          _avatarUrl = publicUrl;
+        });
+        // Perbarui profil setelah avatar diunggah
+        await _updateProfile();
+        _showSnackBar('Avatar berhasil diunggah!', Colors.green);
+      } else {
+        _showSnackBar('Tidak ada gambar yang dipilih.', Colors.blueGrey);
+      }
     } catch (e) {
-      print('DEBUG: Error in _pickAndUploadAvatar: $e');
-      _showSnackBar('Terjadi kesalahan tak terduga: ${e.toString()}', Colors.red);
+      print('DEBUG: Error in _pickAndUploadAvatar: $e'); // Untuk debugging
+      _showSnackBar('Terjadi kesalahan saat mengunggah avatar: ${e.toString()}', Colors.red);
     } finally {
       setState(() {
         _isUploadingAvatar = false;
@@ -164,21 +145,20 @@ class _ProfileState extends State<Profile> {
 
   Future<void> _signOut() async {
     setState(() {
-      _isLoading = true; 
+      _isLoading = true;
     });
     try {
-      await supabase.auth.signOut();
+      await _profileService.signOut(); // Gunakan service untuk logout
       if (mounted) {
         _showSnackBar('Berhasil logout!', Colors.blue);
+        // Arahkan ke halaman login atau halaman utama
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const Placeholder()), 
+          MaterialPageRoute(builder: (context) => const Placeholder()), // Ganti dengan halaman login/home Anda
           (Route<dynamic> route) => false,
         );
       }
-    } on AuthException catch (e) {
-      _showSnackBar('Logout gagal: ${e.message}', Colors.red);
     } catch (e) {
-      _showSnackBar('Terjadi kesalahan tak terduga saat logout: ${e.toString()}', Colors.red);
+      _showSnackBar('Terjadi kesalahan saat logout: ${e.toString()}', Colors.red);
     } finally {
       setState(() {
         _isLoading = false;
@@ -204,41 +184,31 @@ class _ProfileState extends State<Profile> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Profil',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: SafeArea(
-        child: _isLoading 
+        child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.black),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                        const Expanded(
-                          child: Center(
-                            child: Text(
-                              'Profil',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 48), 
-                      ],
-                    ),
                     const SizedBox(height: 24),
                     Center(
                       child: GestureDetector(
-                        onTap: _pickAndUploadAvatar, 
+                        onTap: _pickAndUploadAvatar,
                         child: Stack(
                           children: [
                             CircleAvatar(
@@ -255,7 +225,7 @@ class _ProfileState extends State<Profile> {
                                     )
                                   : null,
                             ),
-                            if (_isUploadingAvatar) 
+                            if (_isUploadingAvatar)
                               const Positioned.fill(
                                 child: Center(
                                   child: CircularProgressIndicator(strokeWidth: 2),
@@ -307,7 +277,7 @@ class _ProfileState extends State<Profile> {
                             const SizedBox(height: 8),
                             TextFormField(
                               controller: TextEditingController(text: _email ?? ''),
-                              readOnly: true, 
+                              readOnly: true,
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                                 border: OutlineInputBorder(
@@ -330,13 +300,13 @@ class _ProfileState extends State<Profile> {
                             const SizedBox(height: 8),
                             TextFormField(
                               obscureText: true,
-                              readOnly: true, 
+                              readOnly: true,
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                hintText: '********', 
+                                hintText: '********',
                               ),
                             ),
                           ],
@@ -348,7 +318,7 @@ class _ProfileState extends State<Profile> {
                       child: SizedBox(
                         width: fieldWidth,
                         child: ElevatedButton(
-                          onPressed: _isUpdating ? null : _updateProfile, 
+                          onPressed: _isUpdating ? null : _updateProfile,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
                             shape: RoundedRectangleBorder(
@@ -370,7 +340,7 @@ class _ProfileState extends State<Profile> {
                       child: SizedBox(
                         width: fieldWidth,
                         child: ElevatedButton(
-                          onPressed: _isLoading ? null : _signOut, 
+                          onPressed: _isLoading ? null : _signOut,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             shape: RoundedRectangleBorder(
@@ -378,7 +348,7 @@ class _ProfileState extends State<Profile> {
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                           ),
-                          child: _isLoading 
+                          child: _isLoading
                               ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                               : const Text(
                                   'Logout',
@@ -394,5 +364,3 @@ class _ProfileState extends State<Profile> {
     );
   }
 }
-
-//biar bisa push
