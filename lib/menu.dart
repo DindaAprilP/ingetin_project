@@ -17,6 +17,16 @@ class _MenuState extends State<Menu> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
+        title: Center(
+          child: Text(
+            'Inget.in',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+        ),
       ),
       backgroundColor: Colors.white,
       body: Center(
@@ -73,7 +83,6 @@ class _MenuState extends State<Menu> {
                 decoration: BoxDecoration(
                   color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.blue, width: 2),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black12,
