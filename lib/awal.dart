@@ -74,7 +74,7 @@ class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateM
             FadeTransition(
               opacity: _opacityAnimation, 
               child: Image.asset(
-                "assets/ingetinHitam.png",
+                "assets/IngetinHitam.png",
                 width: 120, 
                 height: 120,
               ),
