@@ -142,11 +142,6 @@ class _AddToDoPageState extends State<AddToDoPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Tambahkan Judul',
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
-            ),
-            SizedBox(height: 4),
             TextField(
               controller: titleController,
               enabled: !_isLoading,

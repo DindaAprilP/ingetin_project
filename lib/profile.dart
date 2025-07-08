@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ingetin_project/login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ingetin_project/models/profil_models.dart';
@@ -148,12 +149,11 @@ class _ProfileState extends State<Profile> {
       _isLoading = true;
     });
     try {
-      await _profileService.signOut(); // Gunakan service untuk logout
+      await _profileService.signOut(); 
       if (mounted) {
         _showSnackBar('Berhasil logout!', Colors.blue);
-        // Arahkan ke halaman login atau halaman utama
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const Placeholder()), // Ganti dengan halaman login/home Anda
+          MaterialPageRoute(builder: (context) => LoginScreen()), 
           (Route<dynamic> route) => false,
         );
       }
@@ -187,13 +187,14 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'Profil',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+        title: Center(
+          child: Text(
+            'Profil',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 29,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),

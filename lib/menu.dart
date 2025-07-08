@@ -18,13 +18,9 @@ class _MenuState extends State<Menu> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Center(
-          child: Text(
-            'Inget.in',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
+          child: Image.asset(
+            'assets/IngetinPutih.png',
+            height: 30,
           ),
         ),
       ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ingetin_project/navbottom.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:ingetin_project/models/schedule_models.dart'; 
+import 'package:ingetin_project/models/schedule_models.dart';
+import 'package:ingetin_project/menu.dart'; // Import halaman Menu
 
 class Schadule extends StatefulWidget {
   const Schadule({super.key});
@@ -176,8 +178,15 @@ class _SchaduleState extends State<Schadule> {
 
       await supabase.from('jadwal').insert(newJadwal.toMap());
 
-      _showSnackBar('Schedule saved successfully!', Colors.green);
-      _resetForm();
+      _showSnackBar('Jadwal berhasil disimpan!', Colors.green);
+      
+      // Navigasi ke halaman Menu setelah berhasil disimpan
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => bottomNavigationBar()), 
+          (Route<dynamic> route) => false,
+        );
+      }
     } on PostgrestException catch (e) {
       _showSnackBar('Database error: ${e.message}', Colors.red);
     } catch (error) {
@@ -231,25 +240,35 @@ class _SchaduleState extends State<Schadule> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Center(
-          child: Text(
-            'Inget.In',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text(
+          'Tambah jadwal baru',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
-          if (!_isAuthenticated)
-            TextButton(
-              onPressed: _signInDemo,
-              child: const Text(
-                'Demo Login',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+          IconButton(
+            icon: _isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Icon(Icons.check, color: Colors.white),
+            onPressed: _isLoading ? null : _saveSchedule,
+          ),
         ],
       ),
       body: Form(
@@ -260,39 +279,6 @@ class _SchaduleState extends State<Schadule> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back, color: Colors.black),
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Tambah Jadwal Baru',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      onPressed: _isLoading ? null : _saveSchedule,
-                      icon: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.check, color: Colors.black),
-                    ),
-                  ],
-                ),
-
                 if (!_isAuthenticated)
                   Container(
                     margin: const EdgeInsets.only(bottom: 16),
@@ -458,30 +444,6 @@ class _SchaduleState extends State<Schadule> {
                     hintText: 'Masukkan deskripsi jadwal (opsional)',
                   ),
                 ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveSchedule,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _isAuthenticated ? Colors.black : Colors.grey,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Simpan Jadwal',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ),
                 const SizedBox(height: 16),
                 if (!_isAuthenticated)
                   Card(
@@ -504,6 +466,11 @@ class _SchaduleState extends State<Schadule> {
                             '• Email/Password Sign In\n• Google Sign In\n• Other OAuth providers',
                             style: TextStyle(fontSize: 14),
                           ),
+                          const SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: _signInDemo,
+                            child: const Text('Demo Login'),
+                          ),
                         ],
                       ),
                     ),
@@ -516,5 +483,3 @@ class _SchaduleState extends State<Schadule> {
     );
   }
 }
-
-//biar bisa push

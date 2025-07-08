@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'; 
-import 'package:get_storage/get_storage.dart'; 
 import 'navbottom.dart'; 
 
 class AddNotesPage extends StatefulWidget {
@@ -114,16 +113,19 @@ class _AddNotesPageState extends State<AddNotesPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        centerTitle: true,
+        title: Text(
+          'Catatan',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Get.back(); 
           },
-        ),
-        title: Image.asset(
-          'assets/IngetinPutih.png', 
-          height: 30,
         ),
         actions: [
           IconButton(
