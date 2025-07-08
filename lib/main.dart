@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:ingetin_project/awal.dart';
+import 'package:ingetin_project/screens/awal.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/ApiKey.dart';
 

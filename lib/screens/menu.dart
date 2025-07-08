@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ingetin_project/todolist.dart';
-import 'package:ingetin_project/note.dart';
+import 'package:ingetin_project/screens/todolist.dart';
+import 'package:ingetin_project/screens/note.dart';
 import 'schadule.dart';
 
 class Menu extends StatefulWidget {
