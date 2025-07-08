@@ -41,7 +41,7 @@ class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateM
 
    
     Future.delayed(const Duration(seconds: 3), () {
-      Get.off(() => LoginScreen());
+      Get.off(() => const LoginScreen());
     });
   }
 

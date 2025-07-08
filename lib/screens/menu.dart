@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ingetin_project/todolist.dart';
-import 'package:ingetin_project/note.dart';
+import 'package:ingetin_project/screens/todolist.dart';
+import 'package:ingetin_project/screens/note.dart';
 import 'schadule.dart';
 
 class Menu extends StatefulWidget {
@@ -17,7 +17,7 @@ class _MenuState extends State<Menu> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Center(
+        title: const Center(
           child: Text(
             'Inget.in',
             style: TextStyle(
@@ -37,7 +37,7 @@ class _MenuState extends State<Menu> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddNotesPage()),
+                  MaterialPageRoute(builder: (context) => const AddNotesPage()),
                 );
               },
               child: Container(
@@ -53,7 +53,7 @@ class _MenuState extends State<Menu> {
                     ),
                   ],
                 ),
-                child: Column(
+                child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.note_outlined, size: 36, color: Colors.black87),
@@ -69,49 +69,12 @@ class _MenuState extends State<Menu> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>AddToDoPage()),
-                );
-              },
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.check, size: 36, color: Colors.black87),
-                    SizedBox(height: 10),
-                    Text(
-                      'To Do List',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Schadule()),
+                  MaterialPageRoute(builder: (context) =>const AddToDoPage()),
                 );
               },
               child: Container(
@@ -127,7 +90,44 @@ class _MenuState extends State<Menu> {
                     ),
                   ],
                 ),
-                child: Column(
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check, size: 36, color: Colors.black87),
+                    SizedBox(height: 10),
+                    Text(
+                      'To Do List',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Schadule()),
+                );
+              },
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+                child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.schedule, size: 36, color: Colors.black87),

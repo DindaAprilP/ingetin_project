@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'navbottom.dart';
-import 'text_field.dart';
+import '../widgets/navbottom.dart';
+import '../models/text_field.dart';
 import 'package:get/get.dart';
 import 'login.dart';
 
@@ -106,7 +106,7 @@ class _RegisterState extends State<Register> {
         box.write('email', response.user!.email);
         box.write('username', usernameController.text.trim());
         
-        Get.offAll(() => bottomNavigationBar());
+        Get.offAll(() => const bottomNavigationBar());
         Get.snackbar(
           "REGISTER BERHASIL",
           "Akun berhasil dibuat!",
@@ -157,23 +157,23 @@ class _RegisterState extends State<Register> {
                 width: 150,
                 height: 150,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Tombol Login (bisa diklik)
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => LoginScreen());
+                      Get.to(() => const LoginScreen());
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(50),
                         border: Border.all(color: Colors.grey[400]!, width: 1),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Login',
                         style: TextStyle(
                           color: Colors.black54,
@@ -181,14 +181,14 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 5),
+                  const SizedBox(width: 5),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Register',
                       style: TextStyle(
                         color: Colors.white,
@@ -199,10 +199,10 @@ class _RegisterState extends State<Register> {
                 ],
               ),
               
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Container(
                 width: 300,
-                padding: EdgeInsets.all(30),
+                padding: const EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
@@ -215,14 +215,14 @@ class _RegisterState extends State<Register> {
                       labelText: "Username",
                       iconData: Icons.person,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextIsi(
                       controller: emailController,
                       labelText: "E-mail",
                       iconData: Icons.email,
                       keyboardType: TextInputType.emailAddress,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextIsi(
                       controller: passwordController,
                       labelText: "Password",
@@ -235,12 +235,19 @@ class _RegisterState extends State<Register> {
                 )
               ),
               
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               SizedBox(
                 width: 200,
                 height: 45,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : registerWithSupabase,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(80),
+                    ),
+                  ),
                   child: isLoading 
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -258,13 +265,6 @@ class _RegisterState extends State<Register> {
                         ],
                       )
                     : Text('Register'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(80),
-                    ),
-                  ),
                 ),
               ),
             ],

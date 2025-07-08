@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:ingetin_project/navbottom.dart';
+import 'package:ingetin_project/widgets/navbottom.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'register.dart';
-import 'text_field.dart';
+import '../models/text_field.dart';
 import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
           box.write('username', profileResponse['nama_pengguna'] ?? '');
           box.write('avatar_url', profileResponse['url_avatar'] ?? '');
 
-          Get.offAll(() => bottomNavigationBar());
+          Get.offAll(() => const bottomNavigationBar());
           Get.snackbar(
             "LOGIN BERHASIL",
             "Selamat datang, ${profileResponse['nama_pengguna'] ?? 'User'}!",
@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
           box.write('username', '');
           box.write('avatar_url', '');
 
-          Get.offAll(() => bottomNavigationBar());
+          Get.offAll(() => const bottomNavigationBar());
           Get.snackbar(
             "LOGIN BERHASIL",
             "Selamat datang!",
@@ -139,17 +139,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 150,
                 height: 150,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Login',
                       style: TextStyle(
                         color: Colors.white,
@@ -157,19 +157,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 5),
+                  const SizedBox(width: 5),
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => Register());
+                      Get.to(() => const Register());
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(50),
                         border: Border.all(color: Colors.grey[400]!, width: 1),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Register',
                         style: TextStyle(
                           color: Colors.black54,
@@ -179,10 +179,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Container(
                 width: 300,
-                padding: EdgeInsets.all(30),
+                padding: const EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
@@ -196,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       iconData: Icons.email,
                       keyboardType: TextInputType.emailAddress,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextIsi(
                       controller: passwordController,
                       labelText: "Password",
@@ -208,12 +208,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               SizedBox(
                 width: 200,
                 height: 45,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : loginWithSupabase,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(90),
+                    ),
+                  ),
                   child: isLoading 
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -231,13 +238,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       )
                     : Text('Login'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(90),
-                    ),
-                  ),
                 ),
               ),
             ],

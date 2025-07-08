@@ -17,8 +17,8 @@ class _EditCatatanState extends State<EditCatatan> {
   late TextEditingController _judulController;
   late TextEditingController _isiKontenController;
   String? _isiKontenDetailId; 
-  List<TextEditingController> _todoControllers = [];
-  List<bool> _todoChecked = [];
+  final List<TextEditingController> _todoControllers = [];
+  final List<bool> _todoChecked = [];
   late TextEditingController _deskripsiJadwalController;
   late TextEditingController _tanggalJadwalController;
   late TextEditingController _jamMulaiController;
@@ -566,7 +566,7 @@ class _EditCatatanState extends State<EditCatatan> {
                     value == null || value.trim().isEmpty ? 'Judul wajib diisi' : null,
                 enabled: !_isLoading,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               if (widget.catatan == null)
                 Column(
                   children: [

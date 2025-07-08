@@ -56,17 +56,17 @@ class _BerandaState extends State<Beranda> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Hapus Catatan'),
+          title: const Text('Hapus Catatan'),
           content: Text('Apakah Anda yakin ingin menghapus "$judul"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text('Batal'),
+              child: const Text('Batal'),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: Text('Hapus'),
+              child: const Text('Hapus'),
             ),
           ],
         );
@@ -111,13 +111,13 @@ class _BerandaState extends State<Beranda> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.8,
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -131,13 +131,13 @@ class _BerandaState extends State<Beranda> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
                     child: Text(
                       item['judul'],
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -148,28 +148,28 @@ class _BerandaState extends State<Beranda> {
                       Navigator.pop(context); // Tutup modal
                       navigateToEdit(item); // Navigasi ke edit
                     },
-                    icon: Icon(Icons.edit),
+                    icon: const Icon(Icons.edit),
                     tooltip: 'Edit Catatan',
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: _getJenisColor(item['jenis_catatan']),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   _getJenisLabel(item['jenis_catatan']),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Expanded(
                 child: _buildDetailContent(item),
               ),
@@ -193,7 +193,7 @@ class _BerandaState extends State<Beranda> {
         return SingleChildScrollView(
           child: Text(
             item['isi_catatan'] ?? 'Tidak ada isi catatan',
-            style: TextStyle(fontSize: 16, height: 1.5),
+            style: const TextStyle(fontSize: 16, height: 1.5),
           ),
         );
       
@@ -213,11 +213,11 @@ class _BerandaState extends State<Beranda> {
           future: _loadItemTugas(item['id']),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
             
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Text('Tidak ada item tugas');
+              return const Text('Tidak ada item tugas');
             }
             
             return ListView.builder(
@@ -248,13 +248,13 @@ class _BerandaState extends State<Beranda> {
         );
       
       default:
-        return Text('Jenis catatan tidak dikenal');
+        return const Text('Jenis catatan tidak dikenal');
     }
   }
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -262,7 +262,7 @@ class _BerandaState extends State<Beranda> {
             width: 80,
             child: Text(
               '$label:',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
@@ -333,7 +333,7 @@ class _BerandaState extends State<Beranda> {
     final utcDate = DateTime.parse(tanggal);
     
     // Tambahkan 7 jam untuk WIB (UTC+7)
-    final wibDate = utcDate.add(Duration(hours: 7));
+    final wibDate = utcDate.add(const Duration(hours: 7));
     
     return '${wibDate.day}/${wibDate.month}/${wibDate.year} ${wibDate.hour.toString().padLeft(2, '0')}:${wibDate.minute.toString().padLeft(2, '0')} WIB';
   } catch (e) {
@@ -347,7 +347,7 @@ class _BerandaState extends State<Beranda> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Center(
+        title: const Center(
           child: Text(
             'Inget.in',
             style: TextStyle(
@@ -359,13 +359,13 @@ class _BerandaState extends State<Beranda> {
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : catatan.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
+                      SizedBox(
                         width: 150,
                         height: 150,
                         child: Image.asset(
@@ -374,20 +374,20 @@ class _BerandaState extends State<Beranda> {
                           height: 120,
                         ),
                       ),
-                      SizedBox(height: 5),
-                      Text("Belum Ada Catatan"),
+                      const SizedBox(height: 5),
+                      const Text("Belum Ada Catatan"),
                     ],
                   ),
                 )
               : RefreshIndicator(
                   onRefresh: loadCatatan,
                   child: ListView.builder(
-                    padding: EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(16),
                     itemCount: catatan.length,
                     itemBuilder: (context, index) {
                       final item = catatan[index];
                       return Container(
-                        margin: EdgeInsets.only(bottom: 12),
+                        margin: const EdgeInsets.only(bottom: 12),
                         child: Material(
                           color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(12),
@@ -395,14 +395,14 @@ class _BerandaState extends State<Beranda> {
                             borderRadius: BorderRadius.circular(12),
                             onTap: () => lihatDetailCatatan(item),
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 12,
                               ),
                               child: Row(
                                 children: [
                                   Container(
-                                    padding: EdgeInsets.all(8),
+                                    padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
                                       color: _getJenisColor(item['jenis_catatan']),
                                       borderRadius: BorderRadius.circular(8),
@@ -413,20 +413,20 @@ class _BerandaState extends State<Beranda> {
                                       size: 20,
                                     ),
                                   ),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           item['judul'],
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.black87,
                                           ),
                                         ),
-                                        SizedBox(height: 4),
+                                        const SizedBox(height: 4),
                                         if (item['jenis_catatan'] == 'tugas')
                                           Text(
                                             '${item['tugas_selesai']}/${item['total_tugas']} selesai',
@@ -467,7 +467,7 @@ class _BerandaState extends State<Beranda> {
                                       }
                                     },
                                     itemBuilder: (BuildContext context) => [
-                                      PopupMenuItem<String>(
+                                      const PopupMenuItem<String>(
                                         value: 'edit',
                                         child: Row(
                                           children: [
@@ -477,7 +477,7 @@ class _BerandaState extends State<Beranda> {
                                           ],
                                         ),
                                       ),
-                                      PopupMenuItem<String>(
+                                      const PopupMenuItem<String>(
                                         value: 'delete',
                                         child: Row(
                                           children: [

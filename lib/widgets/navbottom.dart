@@ -1,8 +1,8 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:ingetin_project/beranda.dart';
-import 'package:ingetin_project/menu.dart';
-import 'package:ingetin_project/profile.dart';
+import 'package:ingetin_project/screens/beranda.dart';
+import 'package:ingetin_project/screens/menu.dart';
+import 'package:ingetin_project/screens/profile.dart';
 
 class bottomNavigationBar extends StatefulWidget {
   const bottomNavigationBar({super.key});
@@ -15,9 +15,9 @@ class _bottomNavigationBarState extends State<bottomNavigationBar> {
   var _bottomNavIndex = 0;
 
   final List <Widget> _pages = [
-    Beranda(),
-    Menu(),
-    Profile(),
+    const Beranda(),
+    const Menu(),
+    const Profile(),
   ];
 
   final iconList = <IconData>[
