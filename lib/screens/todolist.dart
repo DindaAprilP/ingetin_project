@@ -98,7 +98,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
       SnackBar(
         content: Text(message),
         backgroundColor: backgroundColor,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -108,7 +108,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: Text(
+        title: const Text(
           'To Do List',
           style: TextStyle(
             color: Colors.white,
@@ -116,10 +116,10 @@ class _AddToDoPageState extends State<AddToDoPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           _isLoading
-              ? Padding(
+              ? const Padding(
                   padding: EdgeInsets.all(14),
                   child: SizedBox(
                     width: 20,
@@ -131,44 +131,44 @@ class _AddToDoPageState extends State<AddToDoPage> {
                   ),
                 )
               : IconButton(
-                  icon: Icon(Icons.check, color: Colors.white),
+                  icon: const Icon(Icons.check, color: Colors.white),
                   onPressed: _saveToDoList,
                   tooltip: 'Simpan To-Do List',
                 ),
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Tambahkan Judul',
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             TextField(
               controller: titleController,
               enabled: !_isLoading,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Masukkan judul',
                 isDense: true,
                 contentPadding: EdgeInsets.symmetric(vertical: 10),
                 border: UnderlineInputBorder(),
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Daftar Item',
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
                 itemCount: 3,
                 itemBuilder: (context, index) {
                   return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       children: [
                         Checkbox(
@@ -178,7 +178,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
                               isChecked[index] = value!;
                             });
                           },
-                          shape: CircleBorder(),
+                          shape: const CircleBorder(),
                         ),
                         Expanded(
                           child: TextField(
@@ -198,8 +198,8 @@ class _AddToDoPageState extends State<AddToDoPage> {
             ),
             if (_isLoading)
               Container(
-                padding: EdgeInsets.all(16),
-                child: Row(
+                padding: const EdgeInsets.all(16),
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(),
@@ -251,7 +251,7 @@ class ToDoService {
       return List<Map<String, dynamic>>.from(response);
     } catch (error) {
       print('Error getting todo lists: $error');
-      throw error;
+      rethrow;
     }
   }
 

@@ -484,23 +484,23 @@ class _SchaduleState extends State<Schadule> {
                 ),
                 const SizedBox(height: 16),
                 if (!_isAuthenticated)
-                  Card(
+                  const Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Authentication Info',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
+                          SizedBox(height: 8),
+                          Text(
                             'To save schedules, you need to implement authentication in your app. This can be done using:',
                             style: TextStyle(fontSize: 14),
                           ),
-                          const SizedBox(height: 8),
-                          const Text(
+                          SizedBox(height: 8),
+                          Text(
                             '• Email/Password Sign In\n• Google Sign In\n• Other OAuth providers',
                             style: TextStyle(fontSize: 14),
                           ),

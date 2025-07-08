@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ingetin_project/models/profil_models.dart';
-import 'package:ingetin_project/supabase/profil_supa.dart'; 
+import 'package:ingetin_project/Services/profil_supa.dart'; 
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -231,7 +231,7 @@ class _ProfileState extends State<Profile> {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
                               ),
-                            Positioned(
+                            const Positioned(
                               bottom: 0,
                               right: 0,
                               child: CircleAvatar(

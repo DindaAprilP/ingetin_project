@@ -5,7 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import '../widgets/navbottom.dart'; 
 
 class AddNotesPage extends StatefulWidget {
-  const AddNotesPage({Key? key}) : super(key: key);
+  const AddNotesPage({super.key});
 
   @override
   State<AddNotesPage> createState() => _AddNotesPageState();
@@ -83,7 +83,7 @@ class _AddNotesPageState extends State<AddNotesPage> {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-      Get.offAll(() => bottomNavigationBar()); 
+      Get.offAll(() => const bottomNavigationBar()); 
     } catch (e) {
       print('Error saving note: $e'); // Cetak error ke konsol untuk debugging
       String errorMessage = "Terjadi kesalahan saat menyimpan catatan.";

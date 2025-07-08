@@ -15,9 +15,9 @@ class _bottomNavigationBarState extends State<bottomNavigationBar> {
   var _bottomNavIndex = 0;
 
   final List <Widget> _pages = [
-    Beranda(),
-    Menu(),
-    Profile(),
+    const Beranda(),
+    const Menu(),
+    const Profile(),
   ];
 
   final iconList = <IconData>[
