@@ -100,8 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (error) {
       String errorMessage = "Terjadi kesalahan saat login";
-      
-      // Handle specific errors
       if (error.toString().contains('Invalid login credentials')) {
         errorMessage = "Email atau password salah";
       } else if (error.toString().contains('Email not confirmed')) {
@@ -181,8 +179,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 15),
               Container(
-                width: 300,
-                padding: const EdgeInsets.all(30),
+                width: 300, 
+                padding: const EdgeInsets.all(30), 
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
@@ -208,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               SizedBox(
                 width: 200,
                 height: 45,

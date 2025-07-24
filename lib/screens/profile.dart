@@ -59,7 +59,7 @@ class _ProfileState extends State<Profile> {
       if (mounted) {
         _showSnackBar('Berhasil logout!', Colors.blue);
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const splashAwal()),
+          MaterialPageRoute(builder: (context) => splashAwal()),
           (Route<dynamic> route) => false,
         );
       }
@@ -97,12 +97,12 @@ class _ProfileState extends State<Profile> {
             Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: Colors.purple[100],
+                backgroundColor: Colors.grey,
                 backgroundImage: _profil?.urlAvatar != null && _profil!.urlAvatar!.isNotEmpty
                     ? NetworkImage(_profil!.urlAvatar!)
                     : null,
                 child: _profil?.urlAvatar == null || _profil!.urlAvatar!.isEmpty
-                    ? const Icon(Icons.person, size: 50, color: Colors.deepPurple)
+                    ? const Icon(Icons.person, size: 50, color: Colors.black)
                     : null,
               ),
             ),

@@ -43,7 +43,7 @@ class TextIsi extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius ?? 8.0),
-          borderSide: BorderSide(color: Colors.orange[700]!, width: 2),
+          borderSide: BorderSide(color: Colors.black, width: 2),
         ),
       ),
     );

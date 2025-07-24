@@ -45,13 +45,15 @@ class _EditCatatanState extends State<EditCatatan> {
     } else {
       _judulController.text = '';
       _jenisCatatan = 'catatan'; 
-
-      if (_jenisCatatan == 'tugas') {
-        for (int i = 0; i < 3; i++) {
-          _todoControllers.add(TextEditingController());
-          _todoChecked.add(false);
-        }
+      if (_jenisCatatan == 'tugas') { 
+        _addEmptyTodoItems(3);
       }
+    }
+  }
+  void _addEmptyTodoItems(int count) {
+    for (int i = 0; i < count; i++) {
+      _todoControllers.add(TextEditingController());
+      _todoChecked.add(false);
     }
   }
 
@@ -140,7 +142,7 @@ class _EditCatatanState extends State<EditCatatan> {
     } catch (e) {
       initialDate = DateTime.now();
     }
-    initialDate ??= DateTime.now();
+    initialDate ??= DateTime.now(); 
 
     DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -167,15 +169,21 @@ class _EditCatatanState extends State<EditCatatan> {
     } catch (e) {
       initialTime = TimeOfDay.now();
     }
-    initialTime ??= TimeOfDay.now();
+    initialTime ??= TimeOfDay.now(); 
 
     TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: initialTime,
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), 
+          child: child!,
+        );
+      },
     );
     if (pickedTime != null) {
       setState(() {
-        controller.text = '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}:00'; // Format HH:MM:SS
+        controller.text = '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}'; 
       });
     }
   }
@@ -188,7 +196,6 @@ class _EditCatatanState extends State<EditCatatan> {
     _tanggalJadwalController.dispose();
     _jamMulaiController.dispose();
     _jamSelesaiController.dispose();
-
     
     for (var controller in _todoControllers) {
       controller.dispose();
@@ -207,33 +214,33 @@ class _EditCatatanState extends State<EditCatatan> {
 
     try {
       final userId = supabase.auth.currentUser!.id;
-      final currentTime = DateTime.now().toIso8601String();
+      final currentTimeUtc = DateTime.now().toUtc().toIso8601String(); 
       String? currentCatatanId = widget.catatan?['id']; 
 
       Map<String, dynamic> catatanData = {
         'judul': _judulController.text.trim(),
         'jenis_catatan': _jenisCatatan,
-        'diperbarui_pada': currentTime,
+        'diperbarui_pada': currentTimeUtc, 
       };
 
       if (currentCatatanId == null) {
         catatanData['id_pengguna'] = userId;
-        catatanData['dibuat_pada'] = currentTime;
+        catatanData['dibuat_pada'] = currentTimeUtc; 
         final response = await supabase.from('catatan').insert(catatanData).select('id').single();
         currentCatatanId = response['id'] as String; 
       } else {
+        // Updating an existing note
         await supabase.from('catatan').update(catatanData).eq('id', currentCatatanId);
       }
-
-      if (currentCatatanId == Null) {
-        throw Exception("Gagal mendapatkan ID catatan.");
+      if (currentCatatanId == null) {
+        throw Exception("Gagal mendapatkan ID catatan setelah disimpan.");
       }
 
       if (_jenisCatatan == 'catatan') {
         final isiCatatanData = {
           'id_catatan': currentCatatanId,
           'isi_konten': _isiKontenController.text.trim(),
-          'diperbarui_pada': currentTime,
+          'diperbarui_pada': currentTimeUtc,
         };
         if (_isiKontenDetailId != null && _isiKontenDetailId!.isNotEmpty) {
           await supabase.from('isi_catatan').update(isiCatatanData).eq('id', _isiKontenDetailId!);
@@ -255,8 +262,8 @@ class _EditCatatanState extends State<EditCatatan> {
               'teks_tugas': itemText,
               'sudah_selesai': _todoChecked[i],
               'urutan': i, 
-              'dibuat_pada': currentTime, 
-              'diperbarui_pada': currentTime,
+              'dibuat_pada': currentTimeUtc, 
+              'diperbarui_pada': currentTimeUtc, 
             });
           }
         }
@@ -273,14 +280,13 @@ class _EditCatatanState extends State<EditCatatan> {
         final jadwalData = {
           'id_catatan': currentCatatanId,
           'tanggal_jadwal': _tanggalJadwalController.text.trim(), 
-          'jam_mulai': _jamMulaiController.text.trim(), 
-          'jam_selesai': _jamSelesaiController.text.trim(), 
+          'jam_mulai': _jamMulaiController.text.trim(),   
+          'jam_selesai': _jamSelesaiController.text.trim(),      
           'deskripsi': _deskripsiJadwalController.text.trim(),
-          'diperbarui_pada': currentTime,
+          'diperbarui_pada': currentTimeUtc, 
         };
 
         if (_jadwalDetailId != null && _jadwalDetailId!.isNotEmpty) {
-          
           await supabase
               .from('jadwal')
               .update(jadwalData)
@@ -395,11 +401,13 @@ class _EditCatatanState extends State<EditCatatan> {
                             isDense: true,
                           ),
                           validator: (value) {
-                            bool anyTodoFilled = _todoControllers.any((c) => c.text.trim().isNotEmpty);
-                            if (!anyTodoFilled && (value == null || value.trim().isEmpty)) {
-                              if (index == 0) { 
-                                return 'Minimal satu item tugas wajib diisi';
-                              }
+                            if (_jenisCatatan == 'tugas') {
+                                bool anyTodoFilled = _todoControllers.any((c) => c.text.trim().isNotEmpty);
+                                if (!anyTodoFilled) {
+                                  if (index == 0) { 
+                                    return 'Minimal satu item tugas wajib diisi';
+                                  }
+                                }
                             }
                             return null;
                           },
@@ -410,7 +418,7 @@ class _EditCatatanState extends State<EditCatatan> {
                         onPressed: _isLoading ? null : () {
                           setState(() {
                             if (_todoControllers.length > 1) { 
-                              _todoControllers[index].dispose();
+                              _todoControllers[index].dispose(); 
                               _todoControllers.removeAt(index);
                               _todoChecked.removeAt(index);
                             } else {
@@ -463,7 +471,7 @@ class _EditCatatanState extends State<EditCatatan> {
                 ? 'Tanggal wajib diisi'
                 : null,
             onTap: () => _pickDate(_tanggalJadwalController),
-            readOnly: true,
+            readOnly: true, 
           ),
           const SizedBox(height: 16),
           Row(
@@ -481,7 +489,7 @@ class _EditCatatanState extends State<EditCatatan> {
                       ? 'Jam mulai wajib diisi'
                       : null,
                   onTap: () => _pickTime(_jamMulaiController),
-                  readOnly: true,
+                  readOnly: true, 
                 ),
               ),
               const SizedBox(width: 16),
@@ -498,7 +506,7 @@ class _EditCatatanState extends State<EditCatatan> {
                       ? 'Jam selesai wajib diisi'
                       : null,
                   onTap: () => _pickTime(_jamSelesaiController),
-                  readOnly: true,
+                  readOnly: true, 
                 ),
               ),
             ],
@@ -593,12 +601,9 @@ class _EditCatatanState extends State<EditCatatan> {
                           _todoControllers.clear();
                           _todoChecked.clear();
                           if (_jenisCatatan == 'tugas') {
-                            for (int i = 0; i < 3; i++) {
-                              _todoControllers.add(TextEditingController());
-                              _todoChecked.add(false);
-                            }
+                            _addEmptyTodoItems(3);
                           }
-                          _isiKontenDetailId = null;
+                          _isiKontenDetailId = null; 
                           _jadwalDetailId = null;
                         });
                       },
@@ -626,5 +631,3 @@ class _EditCatatanState extends State<EditCatatan> {
     );
   }
 }
-
-//biar bisa comit

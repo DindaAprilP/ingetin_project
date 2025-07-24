@@ -227,14 +227,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       children: [
                         CircleAvatar(
                           radius: 50,
-                          backgroundColor: Colors.purple[100],
+                          backgroundColor: Colors.grey,
                           backgroundImage: _avatarUrl != null &&
                                   _avatarUrl!.isNotEmpty
                               ? NetworkImage(_avatarUrl!)
                               : null,
                           child: _avatarUrl == null || _avatarUrl!.isEmpty
                               ? const Icon(Icons.person,
-                                  size: 50, color: Colors.deepPurple)
+                                  size: 50, color: Colors.black)
                               : null,
                         ),
                         if (_isUploadingAvatar)

@@ -108,12 +108,14 @@ class _AddToDoPageState extends State<AddToDoPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text(
-          'To Do List',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+        title: Center(
+          child: Text(
+            'To Do List',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),

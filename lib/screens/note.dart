@@ -113,16 +113,21 @@ class _AddNotesPageState extends State<AddNotesPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        centerTitle: true,
+        title: Center(
+          child: Text(
+            'Buat Catatan Baru',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Get.back(); 
           },
-        ),
-        title: Image.asset(
-          'assets/IngetinPutih.png', 
-          height: 30,
         ),
         actions: [
           IconButton(
