@@ -137,17 +137,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 150,
                 height: 150,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Login',
                       style: TextStyle(
                         color: Colors.white,
@@ -155,19 +155,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 5),
+                  SizedBox(width: 5),
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => const Register());
+                      Get.to(() => Register());
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(50),
                         border: Border.all(color: Colors.grey[400]!, width: 1),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Register',
                         style: TextStyle(
                           color: Colors.black54,
@@ -177,10 +177,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 15),
+              SizedBox(height: 15),
               Container(
                 width: 300, 
-                padding: const EdgeInsets.all(30), 
+                padding: EdgeInsets.all(30), 
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
@@ -194,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       iconData: Icons.email,
                       keyboardType: TextInputType.emailAddress,
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     TextIsi(
                       controller: passwordController,
                       labelText: "Password",

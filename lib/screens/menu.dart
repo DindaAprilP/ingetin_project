@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ingetin_project/screens/todolist.dart';
 import 'package:ingetin_project/screens/note.dart';
-import 'schadule.dart';
+import 'schedule_screen.dart';
 
 class Menu extends StatefulWidget {
   const Menu({super.key});
@@ -32,7 +32,7 @@ class _MenuState extends State<Menu> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AddNotesPage()),
+                  MaterialPageRoute(builder: (context) => AddNotesPage()),
                 );
               },
               child: Container(
@@ -41,14 +41,14 @@ class _MenuState extends State<Menu> {
                 decoration: BoxDecoration(
                   color: Colors.blue,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 4,
                     ),
                   ],
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.note_outlined, size: 36, color: Colors.black87),
@@ -64,12 +64,12 @@ class _MenuState extends State<Menu> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) =>const AddToDoPage()),
+                  MaterialPageRoute(builder: (context) => AddToDoPage()),
                 );
               },
               child: Container(
@@ -78,14 +78,14 @@ class _MenuState extends State<Menu> {
                 decoration: BoxDecoration(
                   color: Colors.orange,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 4,
                     ),
                   ],
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.check, size: 36, color: Colors.black87),
@@ -101,12 +101,12 @@ class _MenuState extends State<Menu> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Schadule()),
+                  MaterialPageRoute(builder: (context) => ScheduleScreen()),
                 );
               },
               child: Container(
@@ -115,14 +115,14 @@ class _MenuState extends State<Menu> {
                 decoration: BoxDecoration(
                   color: Colors.green,
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.black12,
                       blurRadius: 4,
                     ),
                   ],
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.schedule, size: 36, color: Colors.black87),

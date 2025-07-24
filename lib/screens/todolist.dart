@@ -16,14 +16,12 @@ class _AddToDoPageState extends State<AddToDoPage> {
   bool _isLoading = false;
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  // Fungsi untuk menyimpan to-do list ke database
   Future<void> _saveToDoList() async {
     if (titleController.text.trim().isEmpty) {
       _showSnackBar('Judul tidak boleh kosong', Colors.red);
       return;
     }
 
-    // Validasi apakah ada item yang diisi
     bool hasItems = itemControllers.any((controller) => controller.text.trim().isNotEmpty);
     if (!hasItems) {
       _showSnackBar('Minimal satu item harus diisi', Colors.red);
@@ -35,14 +33,12 @@ class _AddToDoPageState extends State<AddToDoPage> {
     });
 
     try {
-      // Ambil user ID dari auth
       final user = _supabase.auth.currentUser;
       if (user == null) {
         _showSnackBar('Pengguna belum login', Colors.red);
         return;
       }
 
-      // 1. Insert ke tabel catatan
       final catatanResponse = await _supabase
           .from('catatan')
           .insert({
@@ -54,8 +50,6 @@ class _AddToDoPageState extends State<AddToDoPage> {
           .single();
 
       final String catatanId = catatanResponse['id'];
-
-      // 2. Insert item-item tugas ke tabel item_tugas
       List<Map<String, dynamic>> itemsToInsert = [];
       for (int i = 0; i < itemControllers.length; i++) {
         String itemText = itemControllers[i].text.trim();
@@ -72,11 +66,8 @@ class _AddToDoPageState extends State<AddToDoPage> {
       if (itemsToInsert.isNotEmpty) {
         await _supabase.from('item_tugas').insert(itemsToInsert);
       }
-
-      // Tampilkan pesan sukses
       _showSnackBar('To-Do List berhasil disimpan!', Colors.green);
 
-      // Kembali ke halaman sebelumnya
       Navigator.pop(context, {
         'success': true,
         'catatan_id': catatanId,
@@ -98,7 +89,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
       SnackBar(
         content: Text(message),
         backgroundColor: backgroundColor,
-        duration: const Duration(seconds: 3),
+        duration: Duration(seconds: 3),
       ),
     );
   }
@@ -118,10 +109,10 @@ class _AddToDoPageState extends State<AddToDoPage> {
             ),
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Colors.white),
         actions: [
           _isLoading
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(14),
                   child: SizedBox(
                     width: 20,
@@ -133,44 +124,44 @@ class _AddToDoPageState extends State<AddToDoPage> {
                   ),
                 )
               : IconButton(
-                  icon: const Icon(Icons.check, color: Colors.white),
+                  icon: Icon(Icons.check, color: Colors.white),
                   onPressed: _saveToDoList,
                   tooltip: 'Simpan To-Do List',
                 ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Tambahkan Judul',
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             TextField(
               controller: titleController,
               enabled: !_isLoading,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Masukkan judul',
                 isDense: true,
                 contentPadding: EdgeInsets.symmetric(vertical: 10),
                 border: UnderlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: 20),
+            Text(
               'Daftar Item',
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
                 itemCount: 3,
                 itemBuilder: (context, index) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    padding: EdgeInsets.symmetric(vertical: 4),
                     child: Row(
                       children: [
                         Checkbox(
@@ -180,7 +171,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
                               isChecked[index] = value!;
                             });
                           },
-                          shape: const CircleBorder(),
+                          shape: CircleBorder(),
                         ),
                         Expanded(
                           child: TextField(
@@ -200,8 +191,8 @@ class _AddToDoPageState extends State<AddToDoPage> {
             ),
             if (_isLoading)
               Container(
-                padding: const EdgeInsets.all(16),
-                child: const Row(
+                padding: EdgeInsets.all(16),
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircularProgressIndicator(),
@@ -226,11 +217,8 @@ class _AddToDoPageState extends State<AddToDoPage> {
   }
 }
 
-// Service class untuk operasi database to-do list
 class ToDoService {
   static final SupabaseClient _supabase = Supabase.instance.client;
-
-  // Mendapatkan semua to-do list pengguna
   static Future<List<Map<String, dynamic>>> getUserTodoLists() async {
     try {
       final response = await _supabase
@@ -256,8 +244,6 @@ class ToDoService {
       rethrow;
     }
   }
-
-  // Mendapatkan detail to-do list berdasarkan ID
   static Future<Map<String, dynamic>?> getTodoListById(String catatanId) async {
     try {
       final response = await _supabase
@@ -284,8 +270,6 @@ class ToDoService {
       return null;
     }
   }
-
-  // Update status item tugas
   static Future<bool> updateTaskStatus(String itemId, bool isCompleted) async {
     try {
       await _supabase
@@ -298,8 +282,6 @@ class ToDoService {
       return false;
     }
   }
-
-  // Hapus to-do list
   static Future<bool> deleteTodoList(String catatanId) async {
     try {
       await _supabase
@@ -313,7 +295,6 @@ class ToDoService {
     }
   }
 
-  // Update item tugas
   static Future<bool> updateTask(String itemId, String newText) async {
     try {
       await _supabase

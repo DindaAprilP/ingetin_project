@@ -1,6 +1,6 @@
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:ingetin_project/screens/beranda.dart';
+import 'package:ingetin_project/screens/beranda_screen.dart';
 import 'package:ingetin_project/screens/menu.dart';
 import 'package:ingetin_project/screens/profile.dart';
 
@@ -15,7 +15,7 @@ class _bottomNavigationBarState extends State<bottomNavigationBar> {
   var _bottomNavIndex = 0;
 
   final List <Widget> _pages = [
-    const Beranda(),
+    const BerandaScreen(),
     const Menu(),
     const Profile(),
   ];

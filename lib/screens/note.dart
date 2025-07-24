@@ -13,7 +13,7 @@ class AddNotesPage extends StatefulWidget {
 class _AddNotesPageState extends State<AddNotesPage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController noteController = TextEditingController(); 
-  bool isLoading = false; // Status untuk indikator loading
+  bool isLoading = false; 
 
   @override
   void dispose() {
@@ -23,7 +23,6 @@ class _AddNotesPageState extends State<AddNotesPage> {
   }
 
   Future<void> saveNoteToSupabase() async {
-    // Validasi input judul
     if (titleController.text.trim().isEmpty) {
       Get.snackbar(
         "Gagal Menyimpan",
@@ -68,8 +67,6 @@ class _AddNotesPageState extends State<AddNotesPage> {
       }
 
       final String idCatatanBaru = catatanResponse[0]['id'];
-
-      // 2. Simpan ke tabel 'isi_catatan'
       await supabase.from('isi_catatan').insert({
         'id_catatan': idCatatanBaru,
         'isi_konten': noteController.text.trim(),
@@ -84,14 +81,14 @@ class _AddNotesPageState extends State<AddNotesPage> {
       );
       Get.offAll(() => const bottomNavigationBar()); 
     } catch (e) {
-      print('Error saving note: $e'); // Cetak error ke konsol untuk debugging
+      print('Error saving note: $e'); 
       String errorMessage = "Terjadi kesalahan saat menyimpan catatan.";
       if (e is PostgrestException) {
         errorMessage = "Error database: ${e.message}";
       } else if (e.toString().contains('duplicate key value violates unique constraint')) {
         errorMessage = "Judul catatan sudah ada. Gunakan judul lain.";
       } else {
-        errorMessage = e.toString().replaceFirst('Exception: ', ''); // Hapus "Exception: "
+        errorMessage = e.toString().replaceFirst('Exception: ', ''); 
       }
       Get.snackbar(
         "Gagal Menyimpan",
@@ -124,7 +121,7 @@ class _AddNotesPageState extends State<AddNotesPage> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Get.back(); 
           },
@@ -132,7 +129,7 @@ class _AddNotesPageState extends State<AddNotesPage> {
         actions: [
           IconButton(
             icon: isLoading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
@@ -140,36 +137,36 @@ class _AddNotesPageState extends State<AddNotesPage> {
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
-                : const Icon(Icons.check, color: Colors.white),
+                : Icon(Icons.check, color: Colors.white),
             onPressed: isLoading ? null : saveNoteToSupabase, 
           ),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: titleController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Masukkan Judul',
                 border: InputBorder.none,
               ),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const Divider(
+            Divider(
               thickness: 1,
               color: Colors.black,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Expanded(
               child: TextField(
                 controller: noteController, 
-                decoration: const InputDecoration.collapsed(
+                decoration: InputDecoration.collapsed(
                   hintText: 'Ketik catatan...',
                 ),
                 keyboardType: TextInputType.multiline,
