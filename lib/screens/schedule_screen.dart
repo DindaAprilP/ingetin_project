@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:ingetin_project/widgets/navbottom.dart';
+import 'package:ingetin_project/widgets/navbottom.dart'; 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:ingetin_project/models/schedule_models.dart';
-import 'package:flutter/cupertino.dart'; 
+import 'package:flutter/cupertino.dart';
+import 'package:ingetin_project/services/auth_services.dart';
+import 'package:ingetin_project/services/schedule_service.dart';
 
-class Schadule extends StatefulWidget {
-  const Schadule({super.key});
+class ScheduleScreen extends StatefulWidget { 
+  const ScheduleScreen({super.key});
 
   @override
-  State<Schadule> createState() => _SchaduleState();
+  State<ScheduleScreen> createState() => _ScheduleScreenState();
 }
 
-class _SchaduleState extends State<Schadule> {
+class _ScheduleScreenState extends State<ScheduleScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -21,9 +22,9 @@ class _SchaduleState extends State<Schadule> {
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
   bool _isLoading = false;
-  bool _isAuthenticated = false;
 
-  final supabase = Supabase.instance.client;
+  final _authService = AuthService(); 
+  final _scheduleService = ScheduleService(); 
 
   @override
   void initState() {
@@ -32,31 +33,30 @@ class _SchaduleState extends State<Schadule> {
   }
 
   void _checkAuthStatus() {
-    final session = supabase.auth.currentSession;
-    setState(() {
-      _isAuthenticated = session != null;
-    });
-
-    if (!_isAuthenticated) {
+    if (!_authService.isAuthenticated()) {
       _showAuthDialog();
     }
   }
 
   void _showAuthDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('Otentikasi Dibutuhkan'),
-        content: Text('Anda harus masuk untuk menyimpan jadwal.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text('Otentikasi Dibutuhkan'),
+            content: const Text('Anda harus masuk untuk menyimpan jadwal.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      }
+    });
   }
 
   @override
@@ -71,7 +71,7 @@ class _SchaduleState extends State<Schadule> {
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime(2026),
+      lastDate: DateTime(2101), 
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -98,14 +98,14 @@ class _SchaduleState extends State<Schadule> {
                 children: <Widget>[
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context); 
+                      Navigator.pop(context);
                     },
                     child: Text('Batal'),
                   ),
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context,
-                          TimeOfDay(hour: selectedHour, minute: selectedMinute)); 
+                          TimeOfDay(hour: selectedHour, minute: selectedMinute));
                     },
                     child: Text('Selesai'),
                   ),
@@ -118,7 +118,7 @@ class _SchaduleState extends State<Schadule> {
                       child: CupertinoPicker(
                         scrollController:
                             FixedExtentScrollController(initialItem: selectedHour),
-                        itemExtent: 40, 
+                        itemExtent: 40,
                         onSelectedItemChanged: (int index) {
                           selectedHour = index;
                         },
@@ -127,12 +127,12 @@ class _SchaduleState extends State<Schadule> {
                         }),
                       ),
                     ),
-                    const Text(':', style: TextStyle(fontSize: 24)),
+                    Text(':', style: TextStyle(fontSize: 24)),
                     Expanded(
                       child: CupertinoPicker(
                         scrollController:
                             FixedExtentScrollController(initialItem: selectedMinute),
-                        itemExtent: 40, 
+                        itemExtent: 40,
                         onSelectedItemChanged: (int index) {
                           selectedMinute = index;
                         },
@@ -175,11 +175,11 @@ class _SchaduleState extends State<Schadule> {
   String _formatTimeOfDay(TimeOfDay time) {
     final now = DateTime.now();
     final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    return DateFormat('HH:mm:ss').format(dt);
+    return DateFormat('HH:mm').format(dt); 
   }
 
   Future<void> _saveSchedule() async {
-    if (!_isAuthenticated) {
+    if (!_authService.isAuthenticated()) {
       _showAuthDialog();
       return;
     }
@@ -211,46 +211,32 @@ class _SchaduleState extends State<Schadule> {
     });
 
     try {
-      final userId = supabase.auth.currentUser!.id;
+      final userId = _authService.getCurrentUser()!.id;
 
-      final newCatatan = Catatan(
-        idPengguna: userId,
-        judul: _nameController.text,
-        jenisCatatan: 'jadwal',
-      );
-
-      final response = await supabase
-          .from('catatan')
-          .insert(newCatatan.toMap())
-          .select('id')
-          .single();
-      final String idCatatan = response['id'] as String;
-
-      final newJadwal = Jadwal(
-        idCatatan: idCatatan,
+      await _scheduleService.createNewSchedule(
+        userId: userId,
+        judul: _nameController.text.trim(),
         tanggalJadwal: _selectedDate!,
         jamMulai: _formatTimeOfDay(_startTime!),
         jamSelesai: _formatTimeOfDay(_endTime!),
-        deskripsi: _descriptionController.text.isEmpty
+        deskripsi: _descriptionController.text.trim().isEmpty
             ? null
-            : _descriptionController.text,
+            : _descriptionController.text.trim(),
       );
 
-      await supabase.from('jadwal').insert(newJadwal.toMap());
-
-      _showSnackBar('Schedule saved successfully!', Colors.green);
+      _showSnackBar('Jadwal berhasil disimpan!', Colors.green);
       _resetForm();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (BuildContext context) {
-              return bottomNavigationBar();
+              return bottomNavigationBar(); 
             }),
       );
     } on PostgrestException catch (e) {
-      _showSnackBar('Database error: ${e.message}', Colors.red);
+      _showSnackBar('Error database: ${e.message}', Colors.red);
     } catch (error) {
-      _showSnackBar('Error saving schedule: ${error.toString()}', Colors.red);
+      _showSnackBar('Error menyimpan jadwal: ${error.toString()}', Colors.red);
     } finally {
       setState(() {
         _isLoading = false;
@@ -299,10 +285,10 @@ class _SchaduleState extends State<Schadule> {
             ),
           ),
         ),
-        centerTitle: true, 
+        centerTitle: true,
         actions: [
           IconButton(
-            onPressed: _isLoading ? null : _saveSchedule, 
+            onPressed: _isLoading ? null : _saveSchedule,
             icon: _isLoading
                 ? SizedBox(
                     width: 20,
@@ -311,7 +297,7 @@ class _SchaduleState extends State<Schadule> {
                         strokeWidth: 2, color: Colors.white),
                   )
                 : Icon(Icons.check, color: Colors.white),
-          ), 
+          ),
         ],
       ),
       body: Form(
@@ -322,7 +308,7 @@ class _SchaduleState extends State<Schadule> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (!_isAuthenticated)
+                if (!_authService.isAuthenticated()) 
                   Container(
                     margin: EdgeInsets.only(bottom: 16),
                     padding: EdgeInsets.all(12),
@@ -344,7 +330,6 @@ class _SchaduleState extends State<Schadule> {
                       ],
                     ),
                   ),
-
                 SizedBox(height: 16),
                 Text(
                   'Nama Jadwal',
@@ -501,32 +486,7 @@ class _SchaduleState extends State<Schadule> {
                     hintText: 'Masukkan deskripsi jadwal (opsional)',
                   ),
                 ),
-                 SizedBox(height: 24),
-                if (!_isAuthenticated)
-                  Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Authentication Info',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'To save schedules, you need to implement authentication in your app. This can be done using:',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            '• Email/Password Sign In\n• Google Sign In\n• Other OAuth providers',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                SizedBox(height: 24),
               ],
             ),
           ),

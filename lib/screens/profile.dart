@@ -4,7 +4,7 @@ import 'package:ingetin_project/screens/awal.dart';
 import 'package:ingetin_project/screens/update_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ingetin_project/models/profil_models.dart';
-import 'package:ingetin_project/Services/profil_supa.dart';
+import 'package:ingetin_project/services/profil_supa.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -84,16 +84,16 @@ class _ProfileState extends State<Profile> {
         backgroundColor: Colors.black,
         elevation: 0,
         centerTitle: true,
-        title: const Text('Profil', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+        title: Text('Profil', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : RefreshIndicator(
         onRefresh: _fetchUserProfile,
         child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
           children: [
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Center(
               child: CircleAvatar(
                 radius: 50,
@@ -102,44 +102,43 @@ class _ProfileState extends State<Profile> {
                     ? NetworkImage(_profil!.urlAvatar!)
                     : null,
                 child: _profil?.urlAvatar == null || _profil!.urlAvatar!.isEmpty
-                    ? const Icon(Icons.person, size: 50, color: Colors.black)
+                    ? Icon(Icons.person, size: 50, color: Colors.black)
                     : null,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Center(
               child: Text(
                 _profil?.namaPengguna ?? 'Pengguna',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
             ),
             Center(
               child: Text(
                 _email ?? 'Tidak ada email',
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
-            const SizedBox(height: 32),
-            const Divider(),
+            SizedBox(height: 32),
+            Divider(),
             ListTile(
-              leading: const Icon(Icons.edit_outlined),
-              title: const Text('Edit Profil'),
-              trailing: const Icon(Icons.chevron_right),
+              leading: Icon(Icons.edit_outlined),
+              title: Text('Edit Profil'),
+              trailing: Icon(Icons.chevron_right),
               onTap: () {
-                // Navigasi ke halaman UpdateProfile dan refresh setelah kembali
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const UpdateProfile()),
-                ).then((_) => _fetchUserProfile()); // Refresh data saat kembali
+                  MaterialPageRoute(builder: (context) => UpdateProfile()),
+                ).then((_) => _fetchUserProfile()); 
               },
             ),
-            const Divider(),
+            Divider(),
             ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout', style: TextStyle(color: Colors.red)),
+              leading: Icon(Icons.logout, color: Colors.red),
+              title: Text('Logout', style: TextStyle(color: Colors.red)),
               onTap: _signOut,
             ),
-            const Divider(),
+            Divider(),
           ],
         ),
       ),

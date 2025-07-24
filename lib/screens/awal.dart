@@ -21,7 +21,7 @@ class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateM
     super.initState();
 
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: Duration(seconds: 2),
       vsync: this,
     );
 
@@ -41,7 +41,7 @@ class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateM
 
     _controller.forward(); 
 
-    Future.delayed(const Duration(seconds: 3), () { 
+    Future.delayed(Duration(seconds: 3), () { 
       _redirect();
     });
   }
@@ -51,9 +51,9 @@ class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateM
 
     final session = Supabase.instance.client.auth.currentSession;
     if (session == null) {
-      Get.offAll(() => const LoginScreen());
+      Get.offAll(() => LoginScreen());
     } else {
-      Get.offAll(() => const bottomNavigationBar());
+      Get.offAll(() => bottomNavigationBar());
     }
   }
 
@@ -82,7 +82,7 @@ class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateM
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             FadeTransition(
               opacity: _opacityAnimation,
               child: Image.asset(

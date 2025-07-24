@@ -1,140 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../widgets/navbottom.dart';
-import '../models/text_field.dart';
 import 'package:get/get.dart';
-import 'login.dart';
+import 'package:ingetin_project/widgets/navbottom.dart';
+import 'package:ingetin_project/widgets/custom_text_field.dart';
+import 'package:ingetin_project/services/auth_services.dart';
+import 'package:ingetin_project/screens/login.dart';
 
-class Register extends StatefulWidget {
-  const Register({super.key});
+class RegisterScreen extends StatefulWidget { 
+  const RegisterScreen({super.key});
 
   @override
-  State<Register> createState() => _RegisterState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterState extends State<Register> {
+class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool lihatPass = true;
   bool isLoading = false;
 
-  void lihat(){
+  final AuthService _authService = AuthService(); 
+
+  void _toggleVisibility() { 
     setState(() {
       lihatPass = !lihatPass;
     });
   }
 
-  Future<void> registerWithSupabase() async {
-    // Validasi input kosong
-    if (usernameController.text.trim().isEmpty || 
-        emailController.text.trim().isEmpty || 
-        passwordController.text.trim().isEmpty) {
-      Get.snackbar(
-        "REGISTER GAGAL",
-        "Semua field harus diisi",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    if (usernameController.text.trim().length > 50) {
-      Get.snackbar(
-        "REGISTER GAGAL",
-        "Username maksimal 50 karakter",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(usernameController.text.trim())) {
-      Get.snackbar(
-        "REGISTER GAGAL",
-        "Username hanya boleh berisi huruf, angka, dan underscore",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    // Validasi password minimal 6 karakter
-    if (passwordController.text.length < 6) {
-      Get.snackbar(
-        "REGISTER GAGAL",
-        "Password minimal 6 karakter",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
-    if (!GetUtils.isEmail(emailController.text.trim())) {
-      Get.snackbar(
-        "REGISTER GAGAL",
-        "Format email tidak valid",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      return;
-    }
-
+  Future<void> _handleRegister() async { 
     setState(() {
       isLoading = true;
     });
 
     try {
-      final supabase = Supabase.instance.client;
-      final response = await supabase.auth.signUp(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-        data: {
-          'nama_pengguna': usernameController.text.trim(), // Sesuai dengan database
-        },
+      await _authService.registerUser(
+        username: usernameController.text,
+        email: emailController.text,
+        password: passwordController.text,
       );
-
-      if (response.user != null) {
-        final box = GetStorage();
-        box.write('user_id', response.user!.id);
-        box.write('email', response.user!.email);
-        box.write('username', usernameController.text.trim());
-        
-        Get.offAll(() => const bottomNavigationBar());
-        Get.snackbar(
-          "REGISTER BERHASIL",
-          "Akun berhasil dibuat!",
-          snackPosition: SnackPosition.TOP,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-      }
-    } catch (error) {
-      String errorMessage = "Terjadi kesalahan saat mendaftar";
-      if (error.toString().contains('duplicate key value violates unique constraint')) {
-        errorMessage = "Username sudah digunakan";
-      } else if (error.toString().contains('invalid email')) {
-        errorMessage = "Format email tidak valid";
-      } else if (error.toString().contains('email already registered') || 
-                error.toString().contains('User already registered')) {
-        errorMessage = "Email sudah terdaftar";
-      } else if (error.toString().contains('Password should be at least')) {
-        errorMessage = "Password terlalu pendek";
-      }
-      
-      Get.snackbar(
-        "REGISTER GAGAL",
-        errorMessage,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      Get.offAll(() => bottomNavigationBar());
+    } catch (e) {
+      print("Register failed: $e"); 
     } finally {
       setState(() {
         isLoading = false;
@@ -151,7 +57,7 @@ class _RegisterState extends State<Register> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                "assets/login.png",
+                "assets/login.png", 
                 width: 150,
                 height: 150,
               ),
@@ -159,10 +65,9 @@ class _RegisterState extends State<Register> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Tombol Login (bisa diklik)
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => const LoginScreen());
+                      Get.to(() => const LoginScreen()); 
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
@@ -196,11 +101,11 @@ class _RegisterState extends State<Register> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 15),
               Container(
                 width: 300,
-                padding: EdgeInsets.all(30),
+                padding: const EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
@@ -227,18 +132,18 @@ class _RegisterState extends State<Register> {
                       iconData: Icons.lock,
                       obscureText: lihatPass,
                       suffixIcon: lihatPass ? Icons.visibility_off : Icons.visibility,
-                      onSuffixIconPressed: lihat,
+                      onSuffixIconPressed: _toggleVisibility, 
                     )
                   ],
-                )
+                ),
               ),
-              
+
               const SizedBox(height: 20),
               SizedBox(
                 width: 200,
                 height: 45,
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : registerWithSupabase,
+                  onPressed: isLoading ? null : _handleRegister, 
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.black,
@@ -246,29 +151,29 @@ class _RegisterState extends State<Register> {
                       borderRadius: BorderRadius.circular(80),
                     ),
                   ),
-                  child: isLoading 
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  child: isLoading
+                      ? const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 10),
-                          Text('Loading...'),
-                        ],
-                      )
-                    : Text('Register'),
+                            SizedBox(width: 10),
+                            Text('Loading...'),
+                          ],
+                        )
+                      : const Text('Register'),
                 ),
               ),
             ],
           ),
         ),
-      )
+      ),
     );
   }
 

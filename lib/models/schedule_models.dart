@@ -1,8 +1,8 @@
 import 'package:intl/intl.dart';
 
 class Catatan {
-  final String? id; 
-  final String idPengguna; 
+  final String? id;
+  final String idPengguna;
   final String judul;
   final String jenisCatatan;
   final DateTime? dibuatPada;
@@ -22,6 +22,8 @@ class Catatan {
       'id_pengguna': idPengguna,
       'judul': judul,
       'jenis_catatan': jenisCatatan,
+      'dibuat_pada': dibuatPada?.toIso8601String(),
+      'diperbarui_pada': diperbaruiPada?.toIso8601String(),
     };
   }
 
@@ -38,11 +40,11 @@ class Catatan {
 }
 
 class Jadwal {
-  final String? id; 
-  final String idCatatan; 
+  final String? id;
+  final String idCatatan;
   final DateTime tanggalJadwal;
-  final String jamMulai; 
-  final String jamSelesai; 
+  final String jamMulai;
+  final String jamSelesai;
   final String? deskripsi;
   final DateTime? dibuatPada;
   final DateTime? diperbaruiPada;
@@ -65,6 +67,8 @@ class Jadwal {
       'jam_mulai': jamMulai,
       'jam_selesai': jamSelesai,
       'deskripsi': deskripsi,
+      'dibuat_pada': dibuatPada?.toIso8601String(),
+      'diperbarui_pada': diperbaruiPada?.toIso8601String(),
     };
   }
 

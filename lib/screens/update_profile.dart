@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:ingetin_project/Services/profil_supa.dart';
+import 'package:ingetin_project/services/profil_supa.dart';
 import 'package:ingetin_project/models/profil_models.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -40,7 +40,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
   }
 
   Future<void> _loadInitialProfile() async {
-    // ... (Fungsi ini tidak berubah)
     setState(() => _isLoading = true);
     try {
       final user = Supabase.instance.client.auth.currentUser;
@@ -62,7 +61,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
     }
   }
 
-  // DIUBAH: Fungsi ini sekarang lebih fokus dan jelas
   Future<void> _onSave() async {
     setState(() => _isUpdating = true);
 
@@ -77,7 +75,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
     }
 
     try {
-      // 1. Update Username (selalu dilakukan)
       final profilToUpdate = ProfilPengguna(
         id: user.id,
         namaPengguna: newUsername,
@@ -85,16 +82,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
       );
       await _profileService.updateProfile(profilToUpdate);
 
-      // 2. Cek apakah email berubah
       final isEmailChanged = newEmail != user.email;
       if (isEmailChanged) {
         await _profileService.updateUserEmail(newEmail);
         _showSnackBar(
             'Profil disimpan. Periksa email lama dan baru untuk konfirmasi.',
             Colors.blue);
-        // JANGAN KEMBALI, biarkan pengguna melihat pesan
       } else {
-        // Jika hanya username yang berubah, tampilkan pesan sukses dan kembali
         _showSnackBar('Profil berhasil diperbarui!', Colors.green);
         if (mounted) Navigator.pop(context);
       }
@@ -104,8 +98,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
       setState(() => _isUpdating = false);
     }
   }
-
-  // ... (fungsi _changePassword, _showPasswordDialog, _pickAndUploadAvatar, _showSnackBar tidak berubah)
 
   Future<void> _changePassword() async {
     final newPassword = _passwordController.text.trim();
@@ -121,7 +113,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
     }
 
     setState(() => _isUpdating = true);
-    Navigator.of(context).pop(); // Tutup dialog
+    Navigator.of(context).pop(); 
 
     try {
       await _profileService.updateUserPassword(newPassword);
@@ -218,7 +210,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
               padding:
                   const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               children: [
-                // ... (Widget untuk Avatar tidak berubah)
                 const SizedBox(height: 24),
                 Center(
                   child: GestureDetector(
@@ -258,8 +249,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   ),
                 ),
                 const SizedBox(height: 32),
-
-                // Field untuk Nama Pengguna
                 const Text('Nama Pengguna', style: TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -272,8 +261,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Field untuk Email
                 const Text('Alamat Email', style: TextStyle(fontSize: 16)),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -286,10 +273,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         borderRadius: BorderRadius.circular(10)),
                   ),
                 ),
-
                 const SizedBox(height: 32),
-
-                // Tombol Simpan Perubahan (panggil fungsi _onSave)
                 ElevatedButton(
                   onPressed: _isUpdating ? null : _onSave,
                   style: ElevatedButton.styleFrom(
@@ -305,8 +289,6 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           style: TextStyle(color: Colors.white, fontSize: 16)),
                 ),
                 const SizedBox(height: 12),
-
-                // Tombol Ubah Kata Sandi
                 OutlinedButton(
                   onPressed: _showPasswordDialog,
                   style: OutlinedButton.styleFrom(
