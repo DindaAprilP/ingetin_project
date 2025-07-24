@@ -17,16 +17,11 @@ class _MenuState extends State<Menu> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Center(
-          child: Text(
-            'Inget.in',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
+        title: Image.asset(
+          'assets/IngetinPutih.png',
+          height: 30,
         ),
+        centerTitle: true,
       ),
       backgroundColor: Colors.white,
       body: Center(
@@ -44,7 +39,7 @@ class _MenuState extends State<Menu> {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: Colors.blue,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: const [
                     BoxShadow(
@@ -81,7 +76,7 @@ class _MenuState extends State<Menu> {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: Colors.orange,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: const [
                     BoxShadow(
@@ -118,7 +113,7 @@ class _MenuState extends State<Menu> {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: Colors.green,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: const [
                     BoxShadow(

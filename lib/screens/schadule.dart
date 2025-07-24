@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ingetin_project/widgets/navbottom.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:ingetin_project/models/schedule_models.dart'; 
+import 'package:ingetin_project/models/schedule_models.dart';
+import 'package:flutter/cupertino.dart'; 
 
 class Schadule extends StatefulWidget {
   const Schadule({super.key});
@@ -45,12 +47,12 @@ class _SchaduleState extends State<Schadule> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Authentication Required'),
-        content: const Text('You need to be logged in to save schedules.'),
+        title: Text('Otentikasi Dibutuhkan'),
+        content: Text('Anda harus masuk untuk menyimpan jadwal.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text('OK'),
           ),
         ],
       ),
@@ -69,7 +71,7 @@ class _SchaduleState extends State<Schadule> {
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime.now(),
-      lastDate: DateTime(2026), 
+      lastDate: DateTime(2026),
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -78,17 +80,81 @@ class _SchaduleState extends State<Schadule> {
     }
   }
 
-  Future<void> _selectStartTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
+  Future<TimeOfDay?> _showScrollTimePicker(
+      BuildContext context, TimeOfDay initialTime) async {
+    int selectedHour = initialTime.hour;
+    int selectedMinute = initialTime.minute;
+
+    final TimeOfDay? pickedTime = await showModalBottomSheet<TimeOfDay>(
       context: context,
-      initialTime: _startTime ?? TimeOfDay.now(),
-      builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), 
-          child: child!,
+      builder: (BuildContext context) {
+        return Container(
+          height: 250,
+          color: Colors.white,
+          child: Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); 
+                    },
+                    child: Text('Batal'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context,
+                          TimeOfDay(hour: selectedHour, minute: selectedMinute)); 
+                    },
+                    child: Text('Selesai'),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: CupertinoPicker(
+                        scrollController:
+                            FixedExtentScrollController(initialItem: selectedHour),
+                        itemExtent: 40, 
+                        onSelectedItemChanged: (int index) {
+                          selectedHour = index;
+                        },
+                        children: List<Widget>.generate(24, (int index) {
+                          return Center(child: Text(index.toString().padLeft(2, '0')));
+                        }),
+                      ),
+                    ),
+                    const Text(':', style: TextStyle(fontSize: 24)),
+                    Expanded(
+                      child: CupertinoPicker(
+                        scrollController:
+                            FixedExtentScrollController(initialItem: selectedMinute),
+                        itemExtent: 40, 
+                        onSelectedItemChanged: (int index) {
+                          selectedMinute = index;
+                        },
+                        children: List<Widget>.generate(60, (int index) {
+                          return Center(child: Text(index.toString().padLeft(2, '0')));
+                        }),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
+    return pickedTime;
+  }
+
+  Future<void> _selectStartTime(BuildContext context) async {
+    final TimeOfDay? picked =
+        await _showScrollTimePicker(context, _startTime ?? TimeOfDay.now());
     if (picked != null && picked != _startTime) {
       setState(() {
         _startTime = picked;
@@ -97,16 +163,8 @@ class _SchaduleState extends State<Schadule> {
   }
 
   Future<void> _selectEndTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _endTime ?? TimeOfDay.now(),
-      builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), 
-          child: child!,
-        );
-      },
-    );
+    final TimeOfDay? picked =
+        await _showScrollTimePicker(context, _endTime ?? TimeOfDay.now());
     if (picked != null && picked != _endTime) {
       setState(() {
         _endTime = picked;
@@ -129,20 +187,22 @@ class _SchaduleState extends State<Schadule> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedDate == null) {
-      _showSnackBar('Please select a date', Colors.red);
+      _showSnackBar('Pilih Tanggal', Colors.red);
       return;
     }
 
     if (_startTime == null || _endTime == null) {
-      _showSnackBar('Please select start and end time', Colors.red);
+      _showSnackBar('Pilih Waktu Mulai dan Selesai', Colors.red);
       return;
     }
 
-    final startDateTime = DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day, _startTime!.hour, _startTime!.minute);
-    final endDateTime = DateTime(_selectedDate!.year, _selectedDate!.month, _selectedDate!.day, _endTime!.hour, _endTime!.minute);
+    final startDateTime = DateTime(_selectedDate!.year, _selectedDate!.month,
+        _selectedDate!.day, _startTime!.hour, _startTime!.minute);
+    final endDateTime = DateTime(_selectedDate!.year, _selectedDate!.month,
+        _selectedDate!.day, _endTime!.hour, _endTime!.minute);
 
     if (endDateTime.isBefore(startDateTime)) {
-      _showSnackBar('End time cannot be before start time', Colors.red);
+      _showSnackBar('Waktu selesai tidak boleh sebelum waktu mulai', Colors.red);
       return;
     }
 
@@ -162,22 +222,31 @@ class _SchaduleState extends State<Schadule> {
       final response = await supabase
           .from('catatan')
           .insert(newCatatan.toMap())
-          .select('id') 
-          .single(); 
+          .select('id')
+          .single();
       final String idCatatan = response['id'] as String;
 
       final newJadwal = Jadwal(
-        idCatatan: idCatatan, 
+        idCatatan: idCatatan,
         tanggalJadwal: _selectedDate!,
         jamMulai: _formatTimeOfDay(_startTime!),
         jamSelesai: _formatTimeOfDay(_endTime!),
-        deskripsi: _descriptionController.text.isEmpty ? null : _descriptionController.text,
+        deskripsi: _descriptionController.text.isEmpty
+            ? null
+            : _descriptionController.text,
       );
 
       await supabase.from('jadwal').insert(newJadwal.toMap());
 
       _showSnackBar('Schedule saved successfully!', Colors.green);
       _resetForm();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) {
+              return bottomNavigationBar();
+            }),
+      );
     } on PostgrestException catch (e) {
       _showSnackBar('Database error: ${e.message}', Colors.red);
     } catch (error) {
@@ -190,12 +259,12 @@ class _SchaduleState extends State<Schadule> {
   }
 
   void _showSnackBar(String message, Color color) {
-    if (!mounted) return; 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: color,
-        duration: const Duration(seconds: 3),
+        duration: Duration(seconds: 3),
       ),
     );
   }
@@ -210,30 +279,19 @@ class _SchaduleState extends State<Schadule> {
     });
   }
 
-  Future<void> _signInDemo() async {
-    try {
-      await supabase.auth.signInWithPassword(
-        email: 'demo@example.com',
-        password: 'password123',
-      );
-      _checkAuthStatus();
-      _showSnackBar('Demo login successful!', Colors.blue);
-    } on AuthException catch (e) {
-      _showSnackBar('Login failed: ${e.message}', Colors.red);
-    } catch (error) {
-      _showSnackBar('Login failed: ${error.toString()}', Colors.red);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Center(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Center(
           child: Text(
-            'Inget.In',
+            'Tambah Jadwal Baru',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -241,62 +299,33 @@ class _SchaduleState extends State<Schadule> {
             ),
           ),
         ),
+        centerTitle: true, 
         actions: [
-          if (!_isAuthenticated)
-            TextButton(
-              onPressed: _signInDemo,
-              child: const Text(
-                'Demo Login',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
+          IconButton(
+            onPressed: _isLoading ? null : _saveSchedule, 
+            icon: _isLoading
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
+                  )
+                : Icon(Icons.check, color: Colors.white),
+          ), 
         ],
       ),
       body: Form(
         key: _formKey,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back, color: Colors.black),
-                        ),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Tambah Jadwal Baru',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      onPressed: _isLoading ? null : _saveSchedule,
-                      icon: _isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.check, color: Colors.black),
-                    ),
-                  ],
-                ),
-
                 if (!_isAuthenticated)
                   Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(12),
+                    margin: EdgeInsets.only(bottom: 16),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.orange.shade100,
                       borderRadius: BorderRadius.circular(8),
@@ -305,10 +334,10 @@ class _SchaduleState extends State<Schadule> {
                     child: Row(
                       children: [
                         Icon(Icons.warning, color: Colors.orange.shade700),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'You need to be logged in to save schedules',
+                            'Anda perlu login untuk menyimpan jadwal',
                             style: TextStyle(color: Colors.orange.shade700),
                           ),
                         ),
@@ -316,15 +345,15 @@ class _SchaduleState extends State<Schadule> {
                     ),
                   ),
 
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: 16),
+                Text(
                   'Nama Jadwal',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'Masukkan nama jadwal',
                   ),
@@ -335,16 +364,17 @@ class _SchaduleState extends State<Schadule> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: 16),
+                Text(
                   'Tanggal',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 GestureDetector(
                   onTap: () => _selectDate(context),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(4),
@@ -357,15 +387,16 @@ class _SchaduleState extends State<Schadule> {
                               ? DateFormat('dd/MM/yyyy').format(_selectedDate!)
                               : 'dd/mm/yyyy',
                           style: TextStyle(
-                            color: _selectedDate != null ? Colors.black : Colors.grey,
+                            color:
+                                _selectedDate != null ? Colors.black : Colors.grey,
                           ),
                         ),
-                        const Icon(Icons.calendar_today, color: Colors.grey),
+                        Icon(Icons.calendar_today, color: Colors.grey),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -373,31 +404,37 @@ class _SchaduleState extends State<Schadule> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Jam Mulai',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           GestureDetector(
                             onTap: () => _selectStartTime(context),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 16),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     _startTime != null
                                         ? _startTime!.format(context)
                                         : '00:00',
                                     style: TextStyle(
-                                      color: _startTime != null ? Colors.black : Colors.grey,
+                                      color: _startTime != null
+                                          ? Colors.black
+                                          : Colors.grey,
                                     ),
                                   ),
-                                  const Icon(Icons.access_time, color: Colors.grey),
+                                  Icon(Icons.access_time,
+                                      color: Colors.grey),
                                 ],
                               ),
                             ),
@@ -405,36 +442,42 @@ class _SchaduleState extends State<Schadule> {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Jam Selesai',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           GestureDetector(
                             onTap: () => _selectEndTime(context),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 16),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     _endTime != null
                                         ? _endTime!.format(context)
                                         : '00:00',
                                     style: TextStyle(
-                                      color: _endTime != null ? Colors.black : Colors.grey,
+                                      color: _endTime != null
+                                          ? Colors.black
+                                          : Colors.grey,
                                     ),
                                   ),
-                                  const Icon(Icons.access_time, color: Colors.grey),
+                                  Icon(Icons.access_time,
+                                      color: Colors.grey),
                                 ],
                               ),
                             ),
@@ -444,47 +487,23 @@ class _SchaduleState extends State<Schadule> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: 16),
+                Text(
                   'Deskripsi',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 TextFormField(
                   controller: _descriptionController,
                   maxLines: 4,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'Masukkan deskripsi jadwal (opsional)',
                   ),
                 ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _saveSchedule,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _isAuthenticated ? Colors.black : Colors.grey,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Simpan Jadwal',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 16),
+                 SizedBox(height: 24),
                 if (!_isAuthenticated)
-                  const Card(
+                  Card(
                     child: Padding(
                       padding: EdgeInsets.all(16),
                       child: Column(
@@ -516,5 +535,3 @@ class _SchaduleState extends State<Schadule> {
     );
   }
 }
-
-//biar bisa push

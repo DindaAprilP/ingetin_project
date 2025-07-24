@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get/get.dart';
-import 'edit_catatan.dart';
+import 'package:intl/intl.dart'; 
+import 'edit_catatan.dart'; 
 
 class Beranda extends StatefulWidget {
   const Beranda({super.key});
@@ -43,7 +44,7 @@ class _BerandaState extends State<Beranda> {
       });
       Get.snackbar(
         "Error",
-        "Gagal memuat catatan",
+        "Gagal memuat catatan: $error", 
         snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -56,17 +57,17 @@ class _BerandaState extends State<Beranda> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Hapus Catatan'),
+          title:  Text('Hapus Catatan'),
           content: Text('Apakah Anda yakin ingin menghapus "$judul"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Batal'),
+              child:  Text('Batal'),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('Hapus'),
+              child:  Text('Hapus'),
             ),
           ],
         );
@@ -89,7 +90,7 @@ class _BerandaState extends State<Beranda> {
       } catch (error) {
         Get.snackbar(
           "Error",
-          "Gagal menghapus catatan",
+          "Gagal menghapus catatan: $error", 
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.red,
           colorText: Colors.white,
@@ -100,24 +101,23 @@ class _BerandaState extends State<Beranda> {
 
   Future<void> navigateToEdit(Map<String, dynamic> item) async {
     final result = await Get.to(() => EditCatatan(catatan: item));
-    
     if (result == true) {
-      loadCatatan();
+      loadCatatan(); 
     }
   }
 
   void lihatDetailCatatan(Map<String, dynamic> item) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
+      isScrollControlled: true, 
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
+      shape:  RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
         return Container(
-          height: MediaQuery.of(context).size.height * 0.8,
-          padding: const EdgeInsets.all(20),
+          height: MediaQuery.of(context).size.height * 0.8, 
+          padding:  EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -131,13 +131,13 @@ class _BerandaState extends State<Beranda> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+               SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
                     child: Text(
                       item['judul'],
-                      style: const TextStyle(
+                      style:  TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -145,36 +145,36 @@ class _BerandaState extends State<Beranda> {
                   ),
                   IconButton(
                     onPressed: () {
-                      Navigator.pop(context); // Tutup modal
-                      navigateToEdit(item); // Navigasi ke edit
+                      Navigator.pop(context); 
+                      navigateToEdit(item); 
                     },
-                    icon: const Icon(Icons.edit),
+                    icon:  Icon(Icons.edit),
                     tooltip: 'Edit Catatan',
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: _getJenisColor(item['jenis_catatan']),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   _getJenisLabel(item['jenis_catatan']),
-                  style: const TextStyle(
+                  style:  TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+               SizedBox(height: 20),
               Expanded(
                 child: _buildDetailContent(item),
               ),
               Text(
-                'Diperbarui: ${_formatTanggalWIB(item['diperbarui_pada'])}',
+                'Diperbarui: ${_formatDateTimeToWIB(item['diperbarui_pada'])}',
                 style: TextStyle(
                   color: Colors.grey[600],
                   fontSize: 12,
@@ -193,17 +193,67 @@ class _BerandaState extends State<Beranda> {
         return SingleChildScrollView(
           child: Text(
             item['isi_catatan'] ?? 'Tidak ada isi catatan',
-            style: const TextStyle(fontSize: 16, height: 1.5),
+            style:  TextStyle(fontSize: 16, height: 1.5),
           ),
         );
       
       case 'jadwal':
+        String formattedDate = '-';
+        String formattedTimeRange = '-';
+
+        final String? tanggalJadwalString = item['tanggal_jadwal']; 
+        final String? jamMulaiString = item['jam_mulai'];         
+        final String? jamSelesaiString = item['jam_selesai'];  
+
+        if (tanggalJadwalString != null && tanggalJadwalString.isNotEmpty) {
+          try {
+            final DateTime dateOnlyUtc = DateTime.parse(tanggalJadwalString);
+            final DateTime dateOnlyWib = dateOnlyUtc.add( Duration(hours: 7));
+            formattedDate = DateFormat('dd/MM/yyyy').format(dateOnlyWib);
+          } catch (e) {
+            print('Error parsing tanggal_jadwal for display: $e');
+            formattedDate = tanggalJadwalString; 
+          }
+        }
+        
+        if (tanggalJadwalString != null && tanggalJadwalString.isNotEmpty &&
+            jamMulaiString != null && jamMulaiString.isNotEmpty &&
+            jamSelesaiString != null && jamSelesaiString.isNotEmpty) {
+          try {
+            final List<String> startParts = jamMulaiString.split(':');
+            final List<String> endParts = jamSelesaiString.split(':');
+            final DateTime parsedDate = DateTime.parse(tanggalJadwalString);
+            final DateTime startTimeUtc = DateTime.utc(
+              parsedDate.year,
+              parsedDate.month,
+              parsedDate.day,
+              int.parse(startParts[0]), 
+              int.parse(startParts[1]), 
+            );
+
+            final DateTime endTimeUtc = DateTime.utc(
+              parsedDate.year,
+              parsedDate.month,
+              parsedDate.day,
+              int.parse(endParts[0]),
+              int.parse(endParts[1]), 
+            );
+
+            final DateTime startTimeWib = startTimeUtc.add( Duration(hours: 7));
+            final DateTime endTimeWib = endTimeUtc.add( Duration(hours: 7));
+            formattedTimeRange = '${DateFormat('HH:mm').format(startTimeWib)} - ${DateFormat('HH:mm').format(endTimeWib)}';
+          } catch (e) {
+            print('Error processing jadwal time for WIB conversion: $e');
+            formattedTimeRange = '$jamMulaiString - $jamSelesaiString (Format Error)'; 
+          }
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoRow('Tanggal', _formatTanggalWIB(item['tanggal_jadwal'])),
-            _buildInfoRow('Jam', '${item['jam_mulai']} - ${item['jam_selesai']}'),
-            if (item['deskripsi_jadwal'] != null)
+            _buildInfoRow('Tanggal', formattedDate),
+            _buildInfoRow('Jam', formattedTimeRange),
+            if (item['deskripsi_jadwal'] != null && item['deskripsi_jadwal'].isNotEmpty)
               _buildInfoRow('Deskripsi', item['deskripsi_jadwal']),
           ],
         );
@@ -213,11 +263,11 @@ class _BerandaState extends State<Beranda> {
           future: _loadItemTugas(item['id']),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return  Center(child: CircularProgressIndicator());
             }
             
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Text('Tidak ada item tugas');
+              return  Text('Tidak ada item tugas');
             }
             
             return ListView.builder(
@@ -248,13 +298,13 @@ class _BerandaState extends State<Beranda> {
         );
       
       default:
-        return const Text('Jenis catatan tidak dikenal');
+        return  Text('Jenis catatan tidak dikenal');
     }
   }
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding:  EdgeInsets.symmetric(vertical: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -262,7 +312,7 @@ class _BerandaState extends State<Beranda> {
             width: 80,
             child: Text(
               '$label:',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style:  TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
@@ -283,6 +333,7 @@ class _BerandaState extends State<Beranda> {
       
       return List<Map<String, dynamic>>.from(response);
     } catch (error) {
+      print("Error loading item tugas: $error");
       return [];
     }
   }
@@ -326,20 +377,17 @@ class _BerandaState extends State<Beranda> {
     }
   }
 
-  String _formatTanggalWIB(String? tanggal) {
-  if (tanggal == null) return '-';
-  try {
-    // Parse tanggal sebagai UTC
-    final utcDate = DateTime.parse(tanggal);
-    
-    // Tambahkan 7 jam untuk WIB (UTC+7)
-    final wibDate = utcDate.add(const Duration(hours: 7));
-    
-    return '${wibDate.day}/${wibDate.month}/${wibDate.year} ${wibDate.hour.toString().padLeft(2, '0')}:${wibDate.minute.toString().padLeft(2, '0')} WIB';
-  } catch (e) {
-    return tanggal;
+  String _formatDateTimeToWIB(String? dateTimeString) {
+    if (dateTimeString == null || dateTimeString.isEmpty) return '-';
+    try {
+      final utcDateTime = DateTime.parse(dateTimeString).toUtc();
+      final wibDateTime = utcDateTime.add( Duration(hours: 7));
+      return DateFormat('dd/MM/yyyy HH:mm').format(wibDateTime) + ' WIB';
+    } catch (e) {
+      print("Error formatting date-time string '$dateTimeString' to WIB: $e");
+      return dateTimeString; 
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -347,19 +395,14 @@ class _BerandaState extends State<Beranda> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Center(
-          child: Text(
-            'Inget.in',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
+        title: Image.asset(
+          'assets/tugas', 
+          height: 30,
         ),
+        centerTitle: true,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ?  Center(child: CircularProgressIndicator())
           : catatan.isEmpty
               ? Center(
                   child: Column(
@@ -369,25 +412,25 @@ class _BerandaState extends State<Beranda> {
                         width: 150,
                         height: 150,
                         child: Image.asset(
-                          "assets/berandaKosong.png",
+                          "assets/berandaKosong.png", 
                           width: 120,
                           height: 120,
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      const Text("Belum Ada Catatan"),
+                       SizedBox(height: 5),
+                       Text("Belum Ada Catatan"),
                     ],
                   ),
                 )
               : RefreshIndicator(
                   onRefresh: loadCatatan,
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding:  EdgeInsets.all(16),
                     itemCount: catatan.length,
                     itemBuilder: (context, index) {
                       final item = catatan[index];
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
+                        margin:  EdgeInsets.only(bottom: 12),
                         child: Material(
                           color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(12),
@@ -395,14 +438,14 @@ class _BerandaState extends State<Beranda> {
                             borderRadius: BorderRadius.circular(12),
                             onTap: () => lihatDetailCatatan(item),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
+                              padding:  EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 12,
                               ),
                               child: Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(8),
+                                    padding:  EdgeInsets.all(8),
                                     decoration: BoxDecoration(
                                       color: _getJenisColor(item['jenis_catatan']),
                                       borderRadius: BorderRadius.circular(8),
@@ -413,20 +456,20 @@ class _BerandaState extends State<Beranda> {
                                       size: 20,
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
+                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           item['judul'],
-                                          style: const TextStyle(
+                                          style:  TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                             color: Colors.black87,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
+                                         SizedBox(height: 4),
                                         if (item['jenis_catatan'] == 'tugas')
                                           Text(
                                             '${item['tugas_selesai']}/${item['total_tugas']} selesai',
@@ -435,9 +478,13 @@ class _BerandaState extends State<Beranda> {
                                               color: Colors.grey[600],
                                             ),
                                           )
-                                        else if (item['jenis_catatan'] == 'jadwal' && item['tanggal_jadwal'] != null)
+                                        else if (item['jenis_catatan'] == 'jadwal' && item['tanggal_jadwal'] != null && item['tanggal_jadwal'].isNotEmpty)
                                           Text(
-                                            _formatTanggalWIB(item['tanggal_jadwal']),
+                                            DateFormat('dd/MM/yyyy').format(
+                                              DateTime.parse(item['tanggal_jadwal'])
+                                                  .toUtc()
+                                                  .add( Duration(hours: 7)),
+                                            ),
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.grey[600],
@@ -445,7 +492,7 @@ class _BerandaState extends State<Beranda> {
                                           )
                                         else
                                           Text(
-                                            _formatTanggalWIB(item['diperbarui_pada']),
+                                            _formatDateTimeToWIB(item['diperbarui_pada']),
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.grey[600],
@@ -467,7 +514,7 @@ class _BerandaState extends State<Beranda> {
                                       }
                                     },
                                     itemBuilder: (BuildContext context) => [
-                                      const PopupMenuItem<String>(
+                                       PopupMenuItem<String>(
                                         value: 'edit',
                                         child: Row(
                                           children: [
@@ -477,16 +524,16 @@ class _BerandaState extends State<Beranda> {
                                           ],
                                         ),
                                       ),
-                                      const PopupMenuItem<String>(
+                                       PopupMenuItem<String>(
                                         value: 'delete',
                                         child: Row(
                                           children: [
                                             Icon(Icons.delete, 
-                                                 size: 20, 
-                                                 color: Colors.red),
+                                                  size: 20, 
+                                                  color: Colors.red),
                                             SizedBox(width: 8),
                                             Text('Hapus', 
-                                                 style: TextStyle(color: Colors.red)),
+                                                  style: TextStyle(color: Colors.red)),
                                           ],
                                         ),
                                       ),

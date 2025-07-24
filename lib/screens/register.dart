@@ -117,8 +117,6 @@ class _RegisterState extends State<Register> {
       }
     } catch (error) {
       String errorMessage = "Terjadi kesalahan saat mendaftar";
-      
-      // Handle specific errors
       if (error.toString().contains('duplicate key value violates unique constraint')) {
         errorMessage = "Username sudah digunakan";
       } else if (error.toString().contains('invalid email')) {
@@ -202,7 +200,7 @@ class _RegisterState extends State<Register> {
               const SizedBox(height: 15),
               Container(
                 width: 300,
-                padding: const EdgeInsets.all(30),
+                padding: EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; 
 import 'login.dart';
+import 'package:ingetin_project/widgets/navbottom.dart';
 
 class splashAwal extends StatefulWidget {
   const splashAwal({super.key});
@@ -19,14 +21,14 @@ class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateM
     super.initState();
 
     _controller = AnimationController(
-      duration: const Duration(seconds: 2), 
+      duration: const Duration(seconds: 2),
       vsync: this,
     );
 
     _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeIn, 
+        curve: Curves.easeIn,
       ),
     );
 
@@ -39,22 +41,32 @@ class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateM
 
     _controller.forward(); 
 
-   
-    Future.delayed(const Duration(seconds: 3), () {
-      Get.off(() => const LoginScreen());
+    Future.delayed(const Duration(seconds: 3), () { 
+      _redirect();
     });
+  }
+
+  Future<void> _redirect() async {
+    await Future.delayed(Duration.zero);
+
+    final session = Supabase.instance.client.auth.currentSession;
+    if (session == null) {
+      Get.offAll(() => const LoginScreen());
+    } else {
+      Get.offAll(() => const bottomNavigationBar());
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose(); 
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -70,12 +82,12 @@ class _splashAwalState extends State<splashAwal> with SingleTickerProviderStateM
                 ),
               ),
             ),
-            const SizedBox(height: 10), 
+            const SizedBox(height: 10),
             FadeTransition(
-              opacity: _opacityAnimation, 
+              opacity: _opacityAnimation,
               child: Image.asset(
                 "assets/IngetinHitam.png",
-                width: 120, 
+                width: 120,
                 height: 120,
               ),
             ),

@@ -1,0 +1,2 @@
+D:/flutter/ingetin_project/android/app/.cxx/RelWithDebInfo/6y426o4p/x86_64/CMakeFiles/edit_cache.dir
+D:/flutter/ingetin_project/android/app/.cxx/RelWithDebInfo/6y426o4p/x86_64/CMakeFiles/rebuild_cache.dir
