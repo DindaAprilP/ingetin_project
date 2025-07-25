@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:ingetin_project/widgets/navbottom.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'register.dart';
-import '../models/text_field.dart';
+import 'register.dart'; 
+import '../widgets/text_field.dart'; 
 import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(width: 5),
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => Register());
+                      Get.to(() => RegisterScreen());
                     },
                     child: Container(
                       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),

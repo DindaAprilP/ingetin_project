@@ -8,10 +8,9 @@ class TextIsi extends StatelessWidget {
   final bool obscureText;
   final IconData? suffixIcon;
   final VoidCallback? onSuffixIconPressed;
-  final String? Function(String?)? validator; 
 
   const TextIsi({
-    super.key,
+    Key? key, 
     required this.controller,
     required this.labelText,
     this.iconData,
@@ -19,8 +18,7 @@ class TextIsi extends StatelessWidget {
     this.obscureText = false,
     this.suffixIcon,
     this.onSuffixIconPressed,
-    this.validator, 
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart'; 
-import 'package:intl/intl.dart';
+import 'package:flutter/cupertino.dart';
 
 class JadwalFormWidget extends StatefulWidget {
   final TextEditingController deskripsiController;
