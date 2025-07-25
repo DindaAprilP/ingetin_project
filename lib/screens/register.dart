@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ingetin_project/widgets/navbottom.dart';
-import 'package:ingetin_project/widgets/custom_text_field.dart';
+import 'package:ingetin_project/widgets/text_field.dart';
 import 'package:ingetin_project/services/auth_services.dart';
 import 'package:ingetin_project/screens/login.dart';
 
@@ -61,22 +61,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 width: 150,
                 height: 150,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => const LoginScreen()); 
+                      Get.to(() => LoginScreen()); 
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(50),
                         border: Border.all(color: Colors.grey[400]!, width: 1),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Login',
                         style: TextStyle(
                           color: Colors.black54,
@@ -84,14 +84,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 5),
+                  SizedBox(width: 5),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Register',
                       style: TextStyle(
                         color: Colors.white,
@@ -102,10 +102,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
               ),
 
-              const SizedBox(height: 15),
+              SizedBox(height: 15),
               Container(
                 width: 300,
-                padding: const EdgeInsets.all(30),
+                padding: EdgeInsets.all(30),
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
@@ -118,14 +118,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       labelText: "Username",
                       iconData: Icons.person,
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     TextIsi(
                       controller: emailController,
                       labelText: "E-mail",
                       iconData: Icons.email,
                       keyboardType: TextInputType.emailAddress,
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     TextIsi(
                       controller: passwordController,
                       labelText: "Password",
@@ -138,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               SizedBox(
                 width: 200,
                 height: 45,
@@ -152,7 +152,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   child: isLoading
-                      ? const Row(
+                      ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
@@ -167,7 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Text('Loading...'),
                           ],
                         )
-                      : const Text('Register'),
+                      : Text('Register'),
                 ),
               ),
             ],

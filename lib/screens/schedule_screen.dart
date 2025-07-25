@@ -45,12 +45,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
-            title: const Text('Otentikasi Dibutuhkan'),
-            content: const Text('Anda harus masuk untuk menyimpan jadwal.'),
+            title: Text('Otentikasi Dibutuhkan'),
+            content: Text('Anda harus masuk untuk menyimpan jadwal.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+                child: Text('OK'),
               ),
             ],
           ),

@@ -34,7 +34,7 @@ class ScheduleService {
       jamMulai: jamMulai,
       jamSelesai: jamSelesai,
       deskripsi: deskripsi,
-      dibuatPada: jadwalDetailId == null ? currentTimeUtc : null, // Hanya set saat buat baru
+      dibuatPada: jadwalDetailId == null ? currentTimeUtc : null, 
       diperbaruiPada: currentTimeUtc,
     ).toMap();
 
